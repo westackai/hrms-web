@@ -10,12 +10,14 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 import BasicDetails from "@/components/employee/BasicDetails"
+import EducationDetails from "@/components/employee/EducationDetails"
 import EmployeeDetails from "@/components/employee/EmployeeDetails"
 import BankDetails from "@/components/employee/BankDetails"
-import Confirmation from "@/components/employee/Confirmation"
+import AdditionalInfo from "@/components/employee/AdditionalInfo"
 
 
-import { User, Briefcase, CreditCard, CheckCircle } from "lucide-react"
+
+import { User, Briefcase, CreditCard, CheckCircle, School } from "lucide-react"
 
 type FormValues = {
     employeeCode: string
@@ -124,26 +126,26 @@ export default function AddEmployeeWizardPage() {
     })
 
     // load draft if present
-    useEffect(() => {
-        const draft = localStorage.getItem("employeeDraft")
-        if (draft) {
-            try {
-                const parsed = JSON.parse(draft)
-                formik.setValues({ ...formik.initialValues, ...parsed })
-                toast.success("Loaded saved draft", { position: "top-center", duration: 1500 })
-            } catch (e) {
-                // ignore
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    // useEffect(() => {
+    //     const draft = localStorage.getItem("employeeDraft")
+    //     if (draft) {
+    //         try {
+    //             const parsed = JSON.parse(draft)
+    //             formik.setValues({ ...formik.initialValues, ...parsed })
+    //             toast.success("Loaded saved draft", { position: "top-center", duration: 1500 })
+    //         } catch (e) {
+    //             // ignore
+    //         }
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [])
 
     // validate current step using corresponding schema
     const validateStep = async (step: number) => {
         try {
             if (step === 0) await Step1Schema.validate(formik.values, { abortEarly: false })
-            if (step === 1) await Step2Schema.validate(formik.values, { abortEarly: false })
-            if (step === 2) await Step3Schema.validate(formik.values, { abortEarly: false })
+            if (step === 3) await Step2Schema.validate(formik.values, { abortEarly: false })
+            if (step === 4) await Step3Schema.validate(formik.values, { abortEarly: false })
             // clear step-related errors
             formik.setErrors({})
             return true
@@ -175,7 +177,7 @@ export default function AddEmployeeWizardPage() {
     const handleNext = async () => {
         const ok = await validateStep(activeIndex)
         if (!ok) return
-        if (activeIndex < 3) setActiveIndex((s) => s + 1)
+        if (activeIndex < 4) setActiveIndex((s) => s + 1)
     }
 
     const handleBack = () => {
@@ -191,10 +193,10 @@ export default function AddEmployeeWizardPage() {
             toast.success("Draft saved", { position: "top-center" })
         }, 600)
     }
-    
+
 
     // header titles
-    const titles = ["Basic Details", "Employee Details", "Bank Details", "Confirmation"]
+    const titles = ["Basic Details", "Educational Details", "Employee Details", "Bank Details", "Additional Info"]
 
     return (
         <div className="p-6">
@@ -207,7 +209,7 @@ export default function AddEmployeeWizardPage() {
                     <div className="space-y-6">
                         {/* Top stepper using shadcn Tabs but we will control switching */}
                         <Tabs value={String(activeIndex)}>
-                            <TabsList className="grid grid-cols-4 gap-4 mb-12 bg-gray-50 p-4 rounded-lg">
+                            <TabsList className="grid grid-cols-5 gap-4 mb-12 bg-gray-50 p-4 rounded-lg">
                                 {titles.map((t, idx) => {
                                     const disabled = idx > activeIndex
                                     const active = idx === activeIndex
@@ -221,13 +223,7 @@ export default function AddEmployeeWizardPage() {
                                                 e.preventDefault()
                                                 if (idx <= activeIndex) setActiveIndex(idx)
                                             }}
-                                            className={`
-                        relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
-                        ${active ? "bg-white shadow-md ring-2 ring-blue-500" : "bg-transparent hover:bg-white/50"}
-                        ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}
-                        ${completed ? "hover:bg-white/70" : ""}
-                        justify-start
-                      `}
+                                            className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${active ? "bg-white shadow-md ring-2 ring-blue-500" : "bg-transparent hover:bg-white/50"} ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"} ${completed ? "hover:bg-white/70" : ""} justify-start`}
                                         >
                                             <div className="flex items-center gap-3 w-full">
                                                 <div
@@ -239,9 +235,11 @@ export default function AddEmployeeWizardPage() {
                           `}
                                                 >
                                                     {idx === 0 && <User className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
-                                                    {idx === 1 && <Briefcase className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
-                                                    {idx === 2 && <CreditCard className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
-                                                    {idx === 3 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
+                                                    {idx === 1 && <School className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
+                                                    {idx === 2 && <Briefcase className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
+                                                    {idx === 3 && <CreditCard className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
+                                                    {idx === 4 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
+                                                    {/* {idx === 5 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />} */}
                                                 </div>
                                                 <div className="flex flex-col text-left flex-1">
                                                     <span className={`
@@ -274,9 +272,11 @@ export default function AddEmployeeWizardPage() {
                         {/* Content */}
                         <div className="bg-white p-8 rounded-md border border-gray-100 shadow-sm">
                             {activeIndex === 0 && <BasicDetails formik={formik} />}
-                            {activeIndex === 1 && <EmployeeDetails formik={formik} />}
-                            {activeIndex === 2 && <BankDetails formik={formik} />}
-                            {activeIndex === 3 && <Confirmation formik={formik} />}
+                            {activeIndex === 1 && <EducationDetails formik={formik} />}
+                            {activeIndex === 2 && <EmployeeDetails formik={formik} />}
+                            {activeIndex === 3 && <BankDetails formik={formik} />}
+                            {activeIndex === 4 && <AdditionalInfo formik={formik} />}
+                            
                         </div>
 
                         {/* Footer controls */}
@@ -295,7 +295,7 @@ export default function AddEmployeeWizardPage() {
                                     {isSavingDraft ? "Saving..." : "Save Draft"}
                                 </Button>
 
-                                {activeIndex < 3 ? (
+                                {activeIndex < 4 ? (
                                     <Button onClick={handleNext} className="h-10 bg-blue-600 hover:bg-blue-700 text-white">
                                         Save & Next
                                     </Button>
