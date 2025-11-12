@@ -3,50 +3,83 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter,
-  DialogHeader, DialogTitle
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { MoreVertical, Plus, Pencil, Trash2 } from "lucide-react"
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription,
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-const departments = [
-  { id: 1, name: "Software Development / Engineering", employeeCount: 10 },
+import BranchFormDialog from "@/components/branch/BranchFormDialog"
+
+const defaultBranches = [
+  { id: 1, name: "Information Technology", employeeCount: 120 },
+  { id: 2, name: "Mechanical Engineering", employeeCount: 90 },
+  { id: 3, name: "Civil Engineering", employeeCount: 75 },
 ]
 
-export default function DepartmentsPage() {
+export default function BranchesPage() {
+  const [branches, setBranches] = useState(defaultBranches)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [departmentName, setDepartmentName] = useState("")
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [selectedDept, setSelectedDept] = useState<any>(null)
+  const [selectedBranch, setSelectedBranch] = useState<any>(null)
+  const [dialogMode, setDialogMode] = useState<"create" | "edit">("create")
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
+
+  const handleCreateBranch = (name: string) => {
+    const newBranch = {
+      id: branches.length + 1,
+      name,
+      employeeCount: 0,
+    }
+    setBranches([...branches, newBranch])
+  }
+
+  const handleUpdateBranch = (name: string) => {
+    if (!selectedBranch) return
+    const updated = branches.map((b) =>
+      b.id === selectedBranch.id ? { ...b, name } : b
+    )
+    setBranches(updated)
+  }
+
+  const handleDeleteBranch = () => {
+    if (!selectedBranch) return
+    setBranches(branches.filter((b) => b.id !== selectedBranch.id))
+    setIsDeleteAlertOpen(false)
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* ===== MAIN CONTENT ===== */}
+      {/* ===== Main Content ===== */}
       <div className="flex-grow w-full space-y-4 p-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Departments</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Academic Branches</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Manage your organizational departments
+              Manage academic branches like IT, Mechanical, Civil, etc.
             </p>
           </div>
 
           <Button
             className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => {
+              setDialogMode("create")
+              setSelectedBranch(null)
+              setIsDialogOpen(true)
+            }}
           >
-            <Plus className="w-4 h-4 mr-2" /> Add New
+            <Plus className="w-4 h-4 mr-2" /> Add Branch
           </Button>
         </div>
 
@@ -57,7 +90,7 @@ export default function DepartmentsPage() {
               <thead>
                 <tr className="border-b border-gray-100 bg-slate-50/40">
                   <th className="px-5 py-4 text-left font-medium text-gray-500 text-sm">
-                    Name
+                    Branch Name
                   </th>
                   <th className="px-5 py-4 text-center font-medium text-gray-500 text-sm">
                     Employee Count
@@ -67,22 +100,21 @@ export default function DepartmentsPage() {
                   </th>
                 </tr>
               </thead>
-
               <tbody>
-                {departments.map((department) => (
+                {branches.map((branch) => (
                   <tr
-                    key={department.id}
+                    key={branch.id}
                     className="border-b border-gray-100 hover:bg-slate-50/40 h-[68px]"
                   >
                     <td className="px-5 py-4">
                       <span className="font-medium text-sm text-gray-800">
-                        {department.name}
+                        {branch.name}
                       </span>
                     </td>
 
                     <td className="px-5 py-4 text-center">
                       <span className="text-sm text-gray-600 font-medium">
-                        {department.employeeCount}
+                        {branch.employeeCount}
                       </span>
                     </td>
 
@@ -105,9 +137,9 @@ export default function DepartmentsPage() {
                             <DropdownMenuItem
                               className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
                               onClick={() => {
-                                setSelectedDept(department)
-                                setDepartmentName(department.name)
-                                setIsEditDialogOpen(true)
+                                setSelectedBranch(branch)
+                                setDialogMode("edit")
+                                setIsDialogOpen(true)
                               }}
                             >
                               <Pencil className="h-4 w-4 mr-2" /> Edit
@@ -115,7 +147,7 @@ export default function DepartmentsPage() {
                             <DropdownMenuItem
                               className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
                               onClick={() => {
-                                setSelectedDept(department)
+                                setSelectedBranch(branch)
                                 setIsDeleteAlertOpen(true)
                               }}
                             >
@@ -133,14 +165,52 @@ export default function DepartmentsPage() {
         </div>
       </div>
 
-      {/* ===== FOOTER (STICKY TO BOTTOM) ===== */}
-      <div className="p-4 bg-slate-50/40 flex items-center justify-between text-sm text-muted-foreground border-t border-gray-200">
-        <div>Showing {departments.length} of {departments.length} departments</div>
+      {/* ===== Sticky Footer ===== */}
+      <div className="p-4 bg-slate-50/40 flex items-center justify-between text-sm text-muted-foreground border-t border-gray-200 mt-auto">
+        <div>Showing {branches.length} of {branches.length} branches</div>
+
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>Previous</Button>
-          <Button variant="outline" size="sm" disabled>Next</Button>
+          <Button variant="outline" size="sm" disabled>
+            Previous
+          </Button>
+          <Button variant="outline" size="sm" disabled>
+            Next
+          </Button>
         </div>
       </div>
+
+      {/* ===== Dialogs ===== */}
+      <BranchFormDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        mode={dialogMode}
+        initialData={selectedBranch}
+        onSubmit={(name) =>
+          dialogMode === "create"
+            ? handleCreateBranch(name)
+            : handleUpdateBranch(name)
+        }
+      />
+
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this branch.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDeleteBranch}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

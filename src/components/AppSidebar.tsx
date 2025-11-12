@@ -72,12 +72,12 @@ export default function AppSidebar() {
 
             {!collapsed && (
               <AccordionContent className="pl-11 pt-2 flex flex-col gap-2 text-sm">
-                <Link href="/organization/branches">
+                <Link href="/organization/branch">
                   <Button
                     variant="ghost"
                     className={clsx(
                       "justify-start w-full",
-                      pathname === "/organization/branches"
+                      pathname === "/organization/branch"
                         ? "text-indigo-600 bg-blue-50"
                         : "text-gray-700 hover:bg-gray-100"
                     )}
@@ -114,12 +114,12 @@ export default function AppSidebar() {
                   </Button>
                 </Link>
 
-                <Link href="/organization/shifts">
+                <Link href="/organization/shift">
                   <Button
                     variant="ghost"
                     className={clsx(
                       "justify-start w-full",
-                      pathname === "/organization/shifts"
+                      pathname === "/organization/shift"
                         ? "text-indigo-600 bg-blue-50"
                         : "text-gray-700 hover:bg-gray-100"
                     )}
