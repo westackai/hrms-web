@@ -119,7 +119,6 @@ export default function EmployeeDetails({ formik }: Props) {
         </div>
       </div>
 
-      <hr className="my-6 border-gray-300" />
     </section>
   )
 }
