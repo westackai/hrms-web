@@ -16,6 +16,14 @@ export default function EducationDetails({ formik }: Props) {
       : "h-11"
   }
 
+  // helper for upload input style
+  const getUploadClasses = () => {
+    const hasFile = formik.values.educationDocument
+    return hasFile
+      ? "h-11 w-full text-sm text-blue-900 bg-blue-50 border border-blue-300 rounded-md cursor-pointer focus:outline-none file:h-full file:border-0 file:bg-blue-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-200"
+      : "h-11 w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none file:h-full file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
+  }
+
   return (
     <section>
       <h3 className="text-lg font-semibold text-gray-500 mb-4">
@@ -88,14 +96,24 @@ export default function EducationDetails({ formik }: Props) {
 
         {/* Upload Document */}
         <div className="space-y-2">
-          <Label className="font-medium">Upload Document (placeholder)</Label>
-          <Input
-            name="educationDocument"
-            value={formik.values.educationDocument}
-            onChange={formik.handleChange}
-            placeholder="document filename or id"
-            className={getInputClasses("educationDocument")}
-          />
+          <Label className="font-medium">Upload Document</Label>
+          <div className="relative">
+            <input
+              type="file"
+              name="educationDocument"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const file = event.currentTarget.files?.[0]
+                formik.setFieldValue("educationDocument", file)
+              }}
+              className={getUploadClasses()}
+            />
+          </div>
+
+          {formik.values.educationDocument && (
+            <p className="text-sm text-gray-500">
+              Selected: {formik.values.educationDocument.name}
+            </p>
+          )}
         </div>
       </div>
     </section>

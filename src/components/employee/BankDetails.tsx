@@ -16,11 +16,22 @@ export default function BankDetails({ formik }: Props) {
       : "h-11"
   }
 
+  const getUploadClasses = (fieldName: string) => {
+    const hasFile = formik.values[fieldName]
+    return hasFile
+      ? "h-11 w-full text-sm text-blue-900 bg-blue-50 border border-blue-300 rounded-md cursor-pointer focus:outline-none file:h-full file:border-0 file:bg-blue-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-200"
+      : "h-11 w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none file:h-full file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
+  }
+
   return (
     <section>
       {/* ================= BANK DETAILS ================= */}
-      <h3 className="text-lg font-semibold text-gray-500 mb-4">Bank Details:</h3>
+      <h3 className="text-lg font-semibold text-gray-500 mb-4">
+        Bank Details:
+      </h3>
+
       <div className="grid grid-cols-2 gap-6">
+        {/* Bank Name */}
         <div className="space-y-2">
           <Label className="font-medium">Bank Name</Label>
           <Input
@@ -31,6 +42,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* Account Holder Name */}
         <div className="space-y-2">
           <Label className="font-medium">Account Holder Name</Label>
           <Input
@@ -41,6 +53,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* Account Number */}
         <div className="space-y-2">
           <Label className="font-medium">Account Number</Label>
           <Input
@@ -56,6 +69,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* IFSC Code */}
         <div className="space-y-2">
           <Label className="font-medium">IFSC Code</Label>
           <Input
@@ -66,6 +80,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* Branch Name */}
         <div className="space-y-2">
           <Label className="font-medium">Branch Name</Label>
           <Input
@@ -76,6 +91,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* PAN Number */}
         <div className="space-y-2">
           <Label className="font-medium">PAN Number</Label>
           <Input
@@ -90,19 +106,35 @@ export default function BankDetails({ formik }: Props) {
       <hr className="my-6 border-gray-300" />
 
       {/* ================= LEGAL DOCUMENTS ================= */}
-      <h3 className="text-lg font-semibold text-gray-500 mb-4">Legal Documents:</h3>
+      <h3 className="text-lg font-semibold text-gray-500 mb-4">
+        Legal Documents:
+      </h3>
+
       <div className="grid grid-cols-2 gap-6">
+        {/* Photo Upload */}
         <div className="space-y-2">
-          <Label className="font-medium">Photo (placeholder)</Label>
-          <Input
-            name="photo"
-            value={formik.values.photo}
-            onChange={formik.handleChange}
-            placeholder="photo filename/url or id"
-            className={getInputClasses("photo")}
-          />
+          <Label className="font-medium">Photo</Label>
+          <div className="relative">
+            <input
+              type="file"
+              name="photo"
+              accept="image/*"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const file = event.currentTarget.files?.[0]
+                formik.setFieldValue("photo", file)
+              }}
+              className={getUploadClasses("photo")}
+            />
+          </div>
+
+          {formik.values.photo && (
+            <p className="text-sm text-gray-500">
+              Selected: {formik.values.photo.name}
+            </p>
+          )}
         </div>
 
+        {/* Aadhaar Number */}
         <div className="space-y-2">
           <Label className="font-medium">Aadhaar Number</Label>
           <Input
@@ -118,6 +150,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* PAN Card Number */}
         <div className="space-y-2">
           <Label className="font-medium">PAN Card Number</Label>
           <Input
@@ -128,6 +161,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* Passport Number */}
         <div className="space-y-2">
           <Label className="font-medium">Passport Number</Label>
           <Input
@@ -138,6 +172,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* Driving License Number */}
         <div className="space-y-2">
           <Label className="font-medium">Driving License Number</Label>
           <Input
@@ -148,6 +183,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* UAN */}
         <div className="space-y-2">
           <Label className="font-medium">UAN (EPFO)</Label>
           <Input
@@ -158,6 +194,7 @@ export default function BankDetails({ formik }: Props) {
           />
         </div>
 
+        {/* ESIC Number */}
         <div className="space-y-2">
           <Label className="font-medium">ESIC Number</Label>
           <Input

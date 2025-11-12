@@ -84,7 +84,7 @@ export default function AddEmployeeWizardPage() {
 
     const formik = useFormik<FormValues>({
         initialValues: {
-            employeeCode: "16",
+            employeeCode: "",
             firstName: "",
             middleName: "",
             lastName: "",
@@ -144,8 +144,8 @@ export default function AddEmployeeWizardPage() {
     const validateStep = async (step: number) => {
         try {
             if (step === 0) await Step1Schema.validate(formik.values, { abortEarly: false })
-            if (step === 3) await Step2Schema.validate(formik.values, { abortEarly: false })
-            if (step === 4) await Step3Schema.validate(formik.values, { abortEarly: false })
+            if (step === 2) await Step2Schema.validate(formik.values, { abortEarly: false })
+            if (step === 3) await Step3Schema.validate(formik.values, { abortEarly: false })
             // clear step-related errors
             formik.setErrors({})
             return true
@@ -231,14 +231,14 @@ export default function AddEmployeeWizardPage() {
                             w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-200
                             ${active ? "border-blue-600 bg-blue-600 shadow-lg shadow-blue-200" : ""}
                             ${completed ? "border-green-500 bg-green-500" : ""}
-                            ${!active && !completed ? "border-gray-300 bg-white" : ""}
+                            ${!active && !completed ? "border-gray-300 bg-gray-500" : ""}
                           `}
                                                 >
-                                                    {idx === 0 && <User className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
-                                                    {idx === 1 && <School className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
-                                                    {idx === 2 && <Briefcase className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
-                                                    {idx === 3 && <CreditCard className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
-                                                    {idx === 4 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />}
+                                                    {idx === 0 && <User className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
+                                                    {idx === 1 && <School className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
+                                                    {idx === 2 && <Briefcase className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
+                                                    {idx === 3 && <CreditCard className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
+                                                    {idx === 4 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
                                                     {/* {idx === 5 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />} */}
                                                 </div>
                                                 <div className="flex flex-col text-left flex-1">
@@ -246,7 +246,7 @@ export default function AddEmployeeWizardPage() {
                             text-sm font-medium
                             ${active ? "text-blue-600" : ""}
                             ${completed ? "text-green-600" : ""}
-                            ${!active && !completed ? "text-gray-600" : ""}
+                            ${!active && !completed ? "text-gray-800" : ""}
                           `}>
                                                         {t}
                                                     </span>

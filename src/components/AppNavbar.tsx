@@ -86,7 +86,7 @@ export default function AppNavbar() {
 
           <DropdownMenuContent
             align="end"
-            className="w-[440px] rounded-2xl p-0 mt-4 border shadow-xl"
+            className="w-[440px] rounded-2xl p-0 mt-5 border shadow-xl"
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <h2 className="font-semibold text-lg">Notification</h2>
