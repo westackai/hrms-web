@@ -49,10 +49,13 @@ export default function EmployeesTable() {
 
 
   return (
-    <div className="w-full space-y-4 p-6">
+    <div className="w-full space-y-4 px-4 py-0">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Employees</h1>
+          <div className="flex gap-2">
+            <h1 className="text-2xl font-bold tracking-tight">Employees </h1>
+            <Badge className="bg-blue-100 text-blue-700 border-none">10</Badge>
+          </div>
           <p className="text-sm text-muted-foreground mt-1">
             Manage your employee database
           </p>
@@ -67,90 +70,84 @@ export default function EmployeesTable() {
 
       </div>
 
-      <div className="bg-white border rounded-2xl shadow-sm border-gray-200">
-        <div className="p-4 bg-slate-50/40 border-gray-200">
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="text-base font-semibold">Total Active Employees</h2>
-            <Badge className="bg-blue-100 text-blue-700 border-none">10</Badge>
-          </div>
-        </div>
 
-        <div className="px-8">
-          <div className="bg-white border rounded-2xl shadow-sm border-gray-200 px-4">
-            <div className="overflow-x-auto">
-              <Table className="border-gray-200">
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-b border-gray-100">
-                    <TableHead>User</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Designation</TableHead>
-                    <TableHead>Date Of Joining</TableHead>
-                    <TableHead>Master Branch</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
+      <div className="">
+        <div className="bg-white border rounded-2xl shadow-sm border-gray-200 px-4">
+          <div className="overflow-x-auto">
+            <Table className="border-gray-200">
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-b border-gray-100">
+                  <TableHead>User</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Designation</TableHead>
+                  <TableHead>Date Of Joining</TableHead>
+                  <TableHead>Master Branch</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
 
-                <TableBody>
-                  {data.map((row) => (
-                    <TableRow key={row.id} className="hover:bg-slate-50/40 h-[76px] border-gray-100">
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9 ring-2 ring-gray-100">
-                            <AvatarImage src={row.img} />
-                            <AvatarFallback>{row.name.split(" ").map(n => n[0]).join("").toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span className="font-medium text-sm text-gray-800">{row.name}</span>
-                            <span className="text-gray-500 text-[12px]">{row.designation}</span>
-                          </div>
+              <TableBody>
+                {data.map((row) => (
+                  <TableRow key={row.id} className="hover:bg-slate-50/40 h-[76px] border-gray-100">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9 ring-2 ring-gray-100">
+                          <AvatarImage src={row.img} />
+                          <AvatarFallback>{row.name.split(" ").map(n => n[0]).join("").toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm text-gray-800">{row.name}</span>
+                          <span className="text-gray-500 text-[12px]">{row.designation}</span>
                         </div>
-                      </TableCell>
+                      </div>
+                    </TableCell>
 
-                      <TableCell className="text-gray-500 text-sm">{row.department}</TableCell>
-                      <TableCell className="text-gray-500 text-sm">{row.designation}</TableCell>
-                      <TableCell className="text-gray-500 text-sm">{row.doj}</TableCell>
-                      <TableCell className="text-gray-500 text-sm">{row.branch}</TableCell>
+                    <TableCell className="text-gray-500 text-sm">{row.department}</TableCell>
+                    <TableCell className="text-gray-500 text-sm">{row.designation}</TableCell>
+                    <TableCell className="text-gray-500 text-sm">{row.doj}</TableCell>
+                    <TableCell className="text-gray-500 text-sm">{row.branch}</TableCell>
 
-                      <TableCell>
-                        <Badge className="bg-green-50 text-green-700 border-green-200 rounded-full px-3 py-1 text-xs font-medium">
-                          Active
-                        </Badge>
-                      </TableCell>
+                    <TableCell>
+                      <Badge className="bg-green-50 text-green-700 border-green-200 rounded-full px-3 py-1 text-xs font-medium">
+                        Active
+                      </Badge>
+                    </TableCell>
 
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Edit Employee</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">Deactivate</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem>Edit Employee</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">Deactivate</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
 
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-slate-50/40 flex items-center justify-between text-sm text-muted-foreground border-gray-200">
-          <div>Showing 9 of 10 employees</div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>Previous</Button>
-            <Button variant="outline" size="sm">Next</Button>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </div>
-       {loading && <Loader />}
+
+      <div className="p-4 bg-slate-50/40 flex items-center justify-between text-sm text-muted-foreground border-gray-200">
+        <div>Showing 9 of 10 employees</div>
+
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" disabled>Previous</Button>
+          <Button variant="outline" size="sm">Next</Button>
+        </div>
+      </div>
+
+
+      {loading && <Loader />}
 
     </div>
   )

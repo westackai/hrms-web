@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="h-screen sticky top-0">
             <AppSidebar />
           </div>
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col overflow-hidden">
             <AppNavbar />
             <main className="p-6">
               {children}
