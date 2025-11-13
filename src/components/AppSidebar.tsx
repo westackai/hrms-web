@@ -27,8 +27,7 @@ export default function AppSidebar() {
         />
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="bg-blue-600 w-8 h-8 rounded-lg"></div>
-            <p className="font-semibold text-black text-[18px]">PAYROLL</p>
+            <p className="font-semibold text-black text-[18px]">WESTACK SOLUTIONS</p>
           </div>
         )}
       </div>

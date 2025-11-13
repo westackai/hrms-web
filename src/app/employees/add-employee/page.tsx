@@ -1,339 +1,204 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import toast from "react-hot-toast"
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-
 import BasicDetails from "@/components/employee/BasicDetails"
-import EducationDetails from "@/components/employee/EducationDetails"
-import EmployeeDetails from "@/components/employee/EmployeeDetails"
-import BankDetails from "@/components/employee/BankDetails"
-import AdditionalInfo from "@/components/employee/AdditionalInfo"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, User, Briefcase, CreditCard, School, CheckCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-
-
-import { User, Briefcase, CreditCard, CheckCircle, School } from "lucide-react"
-
-type FormValues = {
-    employeeCode: string
-    firstName: string
-    middleName: string
-    lastName: string
-    gender: string
-    dob: string
-    maritalStatus: string
-    bloodGroup: string
-    mobileNumber: string
-    officialEmail: string
-    personalEmail: string
-    doj: string
-    department: string
-    designation: string
-    employeeType: string
-    workMode: string
-    reportingManager: string
-    workLocation: string
-    shiftTiming: string
-    employeeStatus: string
-    bankName: string
-    accountHolderName: string
-    accountNumber: string
-    ifscCode: string
-    branchName: string
-    bankPanNumber: string
-}
-
-const phoneReg = /^[0-9]{10}$/
-
-// Step-wise Yup schemas
 const Step1Schema = Yup.object({
-    employeeCode: Yup.string().required("Employee Code is required"),
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
-    gender: Yup.string().required("Gender is required"),
-    dob: Yup.string().required("Date of Birth is required"),
-    mobileNumber: Yup.string().matches(phoneReg, "Enter valid 10 digit number").required("Mobile Number is required"),
+  employeeCode: Yup.string().required("Employee Code is required"),
+  firstName: Yup.string().required("First Name is required"),
+  lastName: Yup.string().required("Last Name is required"),
+  gender: Yup.string().required("Gender is required"),
+  dob: Yup.string().required("Date of Birth is required"),
+  mobileNumber: Yup.string()
+    .matches(/^[0-9]{10}$/, "Enter valid 10 digit number")
+    .required("Mobile Number is required"),
 })
 
-const Step2Schema = Yup.object({
-    doj: Yup.string().required("Date of Joining is required"),
-    department: Yup.string().required("Department is required"),
-    designation: Yup.string().required("Designation is required"),
-    employeeType: Yup.string().required("Employee Type is required"),
-    workMode: Yup.string().required("Work Mode is required"),
-})
+export default function AddEmployeePage() {
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [SubmitAndUpdating, setSubmitAndUpdating] = useState(false)
 
-const Step3Schema = Yup.object({
-    bankName: Yup.string().nullable(),
-    accountHolderName: Yup.string().nullable(),
-    accountNumber: Yup.string().nullable(),
-    ifscCode: Yup.string().nullable(),
-    branchName: Yup.string().nullable(),
-    bankPanNumber: Yup.string().nullable(),
-})
+  const formik = useFormik({
+    initialValues: {
+      employeeCode: "EMP001",
+      firstName: "John",
+      middleName: "A.",
+      lastName: "Doe",
+      gender: "Male",
+      dob: "1995-01-01",
+      maritalStatus: "Single",
+      bloodGroup: "O+",
+      mobileNumber: "9876543210",
+      officialEmail: "john.doe@company.com",
+      personalEmail: "john.doe@example.com",
+    },
+    onSubmit: async (values) => {
+      await new Promise((r) => setTimeout(r, 700))
+      localStorage.setItem("employeeBasic", JSON.stringify(values))
+      toast.success("Employee added!", { position: "top-center" })
+      router.push("/employees/edit-employee")
+    },
+  })
 
-export default function AddEmployeeWizardPage() {
-    const [activeIndex, setActiveIndex] = useState<number>(0) // 0..3
-    const [isSavingDraft, setIsSavingDraft] = useState(false)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const formik = useFormik<FormValues>({
-        initialValues: {
-            employeeCode: "",
-            firstName: "",
-            middleName: "",
-            lastName: "",
-            gender: "",
-            dob: "",
-            maritalStatus: "",
-            bloodGroup: "",
-            mobileNumber: "",
-            officialEmail: "",
-            personalEmail: "",
-            doj: "",
-            department: "",
-            designation: "",
-            employeeType: "",
-            workMode: "",
-            reportingManager: "",
-            workLocation: "",
-            shiftTiming: "",
-            employeeStatus: "",
-            bankName: "",
-            accountHolderName: "",
-            accountNumber: "",
-            ifscCode: "",
-            branchName: "",
-            bankPanNumber: "",
-        },
-        validationSchema: undefined, // we validate per-step manually
-        onSubmit: async (values, { resetForm }) => {
-            setIsSubmitting(true)
-            // simulate API call
-            await new Promise((r) => setTimeout(r, 1200))
-            console.log("Final submitted payload:", values)
-            toast.success("Employee details submitted successfully!", { position: "top-center" })
-            setIsSubmitting(false)
-            resetForm()
-            setActiveIndex(0)
-            localStorage.removeItem("employeeDraft")
-        },
-    })
-
-    // load draft if present
-    // useEffect(() => {
-    //     const draft = localStorage.getItem("employeeDraft")
-    //     if (draft) {
-    //         try {
-    //             const parsed = JSON.parse(draft)
-    //             formik.setValues({ ...formik.initialValues, ...parsed })
-    //             toast.success("Loaded saved draft", { position: "top-center", duration: 1500 })
-    //         } catch (e) {
-    //             // ignore
-    //         }
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [])
-
-    // validate current step using corresponding schema
-    const validateStep = async (step: number) => {
-        try {
-            if (step === 0) await Step1Schema.validate(formik.values, { abortEarly: false })
-            if (step === 1) await Step2Schema.validate(formik.values, { abortEarly: false })
-            if (step === 2) await Step3Schema.validate(formik.values, { abortEarly: false })
-            // clear step-related errors
-            formik.setErrors({})
-            return true
-        } catch (err: any) {
-            // collect errors and set on formik
-            const yupErr = err
-            const errors: Record<string, string> = {}
-            if (yupErr.inner && yupErr.inner.length) {
-                yupErr.inner.forEach((e: any) => {
-                    if (e.path && !errors[e.path]) errors[e.path] = e.message
-                })
-            } else if (yupErr.path) {
-                errors[yupErr.path] = yupErr.message
-            }
-            formik.setErrors(errors)
-            // mark touched for visible validation
-            const touched: any = {}
-            Object.keys(errors).forEach(k => (touched[k] = true))
-            formik.setTouched({ ...formik.touched, ...touched })
-            // show top toast for first error
-            const first = Object.values(errors)[0]
-            if (first) {
-                toast.error(first, { position: "top-center", duration: 3500 })
-            }
-            return false
-        }
+  const handleSaveUpdate = async () => {
+    try {
+      await Step1Schema.validate(formik.values, { abortEarly: false })
+      formik.setErrors({})
+      setSubmitAndUpdating(true)
+      await formik.submitForm()
+      setSubmitAndUpdating(false)
+    } catch (err: any) {
+      setSubmitAndUpdating(false)
+      const errors: Record<string, string> = {}
+      if (err.inner && err.inner.length) {
+        err.inner.forEach((e: any) => {
+          if (e.path && !errors[e.path]) errors[e.path] = e.message
+        })
+      }
+      formik.setErrors(errors)
+      const first = Object.values(errors)[0]
+      if (first) toast.error(first, { position: "top-center" })
     }
+  }
 
-    const handleNext = async () => {
-        const ok = await validateStep(activeIndex)
-        if (!ok) return
-        if (activeIndex < 4) setActiveIndex((s) => s + 1)
+  const handleSaveOnly = async () => {
+    try {
+      await Step1Schema.validate(formik.values, { abortEarly: false })
+      formik.setErrors({})
+      setIsSubmitting(true)
+      await new Promise((r) => setTimeout(r, 700))
+      localStorage.setItem("employeeBasic", JSON.stringify(formik.values))
+      toast.success("Employee added!", { position: "top-center" })
+      setIsSubmitting(false)
+    } catch (err: any) {
+      setIsSubmitting(false)
+      const errors: Record<string, string> = {}
+      if (err.inner && err.inner.length) {
+        err.inner.forEach((e: any) => {
+          if (e.path && !errors[e.path]) errors[e.path] = e.message
+        })
+      }
+      formik.setErrors(errors)
+      const first = Object.values(errors)[0]
+      if (first) toast.error(first, { position: "top-center" })
     }
+  }
 
-    const handleBack = () => {
-        if (activeIndex > 0) setActiveIndex((s) => s - 1)
-    }
+  const titles = [
+    "Basic Details",
+    "Employee Details",
+    "Bank & ID Details",
+    "Educational Details",
+    "Additional Info",
+  ]
 
-    const handleSaveDraft = () => {
-        setIsSavingDraft(true)
-        // save to localStorage
-        localStorage.setItem("employeeDraft", JSON.stringify(formik.values))
-        setTimeout(() => {
-            setIsSavingDraft(false)
-            toast.success("Draft saved", { position: "top-center" })
-        }, 600)
-    }
+  return (
+    <div className="p-6">
+      <Card className="shadow-md border border-gray-200 rounded-xl">
+        {/* Header */}
+        <CardHeader className="border-b pb-4 border-gray-300 flex items-center space-x-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <CardTitle className="text-blue-600 text-xl font-semibold">
+            Add Employee
+          </CardTitle>
+        </CardHeader>
 
-
-    // header titles
-    const titles = ["Basic Details", "Employee Details", "Bank & ID Details","Educational Details", "Additional Info"]
-
-    return (
-        <div className="p-6">
-            <Card className="shadow-md border border-gray-200 rounded-xl">
-                <CardHeader className="border-b pb-4 border-gray-300">
-                    <CardTitle className="text-blue-600 text-xl font-semibold">Add Employee</CardTitle>
-                </CardHeader>
-
-                <CardContent className="pt-3">
-                    <div className="space-y-6">
-                        {/* Top stepper using shadcn Tabs but we will control switching */}
-                        <Tabs value={String(activeIndex)}>
-                            <TabsList className="grid grid-cols-5 gap-2 mb-12 bg-gray-50 p-3 rounded-lg">
-                                {titles.map((t, idx) => {
-                                    const disabled = idx > activeIndex
-                                    const active = idx === activeIndex
-                                    const completed = idx < activeIndex
-
-                                    return (
-                                        <TabsTrigger
-                                            key={t}
-                                            value={String(idx)}
-                                            onClick={(e: any) => {
-                                                e.preventDefault()
-                                                if (idx <= activeIndex) setActiveIndex(idx)
-                                            }}
-                                            className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${active ? "bg-white shadow-md ring-2 ring-blue-500" : "bg-transparent hover:bg-white/50"} ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"} ${completed ? "hover:bg-white/70" : ""} justify-start`}
-                                        >
-                                            <div className="flex items-center gap-3 w-full">
-                                                <div
-                                                    className={`
-                            w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all duration-200
-                            ${active ? "border-blue-600 bg-blue-600 shadow-lg shadow-blue-200" : ""}
-                            ${completed ? "border-green-500 bg-green-500" : ""}
-                            ${!active && !completed ? "border-gray-300 bg-gray-500" : ""}
-                          `}
-                                                >
-                                                    {idx === 0 && <User className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
-                                                    {idx === 1 && <Briefcase className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
-                                                    {idx === 2 && <CreditCard className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
-                                                    {idx === 3 && <School className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
-                                                    {idx === 4 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-800"}`} />}
-                                                    {/* {idx === 5 && <CheckCircle className={`w-5 h-5 ${active || completed ? "text-white" : "text-gray-500"}`} />} */}
-                                                </div>
-                                                <div className="flex flex-col text-left flex-1">
-                                                    <span className={`
-                            text-sm font-medium
-                            ${active ? "text-blue-600" : ""}
-                            ${completed ? "text-green-600" : ""}
-                            ${!active && !completed ? "text-gray-800" : ""}
-                          `}>
-                                                        {t}
-                                                    </span>
-                                                    <span className="text-xs text-gray-500 mt-0.5">
-                                                        {completed ? "Completed" : active ? "In progress" : "Upcoming"}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {/* Progress connector line */}
-                                            {/* {idx < 3 && (
-                                                <div className={`
-                          absolute top-1/2 -right-4 w-4 h-0.5 -translate-y-1/2
-                          ${completed ? "bg-green-500" : "bg-gray-300"}
-                        `} />
-                                            )} */}
-                                        </TabsTrigger>
-                                    )
-                                })}
-                            </TabsList>
-                        </Tabs>
-
-                        {/* Content */}
-                        <div className="bg-white p-8 rounded-md border border-gray-100 shadow-sm">
-                            {activeIndex === 0 && <BasicDetails formik={formik} />}
-                            {activeIndex === 1 && <EmployeeDetails formik={formik} />}
-                            {activeIndex === 2 && <BankDetails formik={formik} />}
-                            {activeIndex === 3 && <EducationDetails formik={formik} />}
-                            {activeIndex === 4 && <AdditionalInfo formik={formik} />}
-                            
-                        </div>
-
-                        {/* Footer controls */}
-                        <div className="flex items-center justify-between">
-                            <div>
-                                {activeIndex > 0 && (
-                                    <Button variant="outline" onClick={handleBack} className="mr-2 h-10">
-                                        Back
-                                    </Button>
-                                )}
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                {/* Save draft (doesn't submit to server) */}
-                                <Button variant="ghost" onClick={handleSaveDraft} disabled={isSavingDraft} className="h-10">
-                                    {isSavingDraft ? "Saving..." : "Save Draft"}
-                                </Button>
-
-                                {activeIndex < 4 ? (
-                                    <Button onClick={handleNext} className="h-10 bg-blue-600 hover:bg-blue-700 text-white">
-                                        Save & Next
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        onClick={() => {
-                                            // final validation for all steps before submit
-                                            Promise.all([Step1Schema.validate(formik.values, { abortEarly: false }), Step2Schema.validate(formik.values, { abortEarly: false }), Step3Schema.validate(formik.values, { abortEarly: false })])
-                                                .then(() => {
-                                                    formik.handleSubmit()
-                                                })
-                                                .catch((err) => {
-                                                    // compile errors and show
-                                                    const errors: Record<string, string> = {}
-                                                    if (Array.isArray(err)) {
-                                                        err.forEach((y: any) => {
-                                                            if (y.inner) y.inner.forEach((i: any) => (errors[i.path] = i.message))
-                                                        })
-                                                    } else if (err.inner) {
-                                                        err.inner.forEach((i: any) => (errors[i.path] = i.message))
-                                                    }
-                                                    formik.setErrors(errors)
-                                                    // show first error
-                                                    const first = Object.values(errors)[0]
-                                                    if (first) toast.error(first, { position: "top-center" })
-                                                })
-                                        }}
-                                        className="h-10 bg-green-600 hover:bg-green-700 text-white"
-                                        disabled={isSubmitting}
-                                    >
-                                        {isSubmitting ? "Submitting..." : "Submit All"}
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
+        {/* Tabs */}
+        <CardContent className="pt-3">
+          <Tabs value="0">
+            <TabsList className="grid grid-cols-5 gap-2 mb-12 bg-gray-50 p-3 rounded-lg">
+              {titles.map((t, idx) => (
+                <TabsTrigger
+                  key={t}
+                  value={String(idx)}
+                  disabled={idx !== 0}
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    idx === 0
+                      ? "bg-white shadow-md ring-2 ring-blue-500"
+                      : "bg-transparent opacity-40 cursor-not-allowed"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 w-full">
+                    <div
+                      className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all ${
+                        idx === 0
+                          ? "border-blue-600 bg-blue-600"
+                          : "border-gray-300 bg-gray-400"
+                      }`}
+                    >
+                      {idx === 0 && <User className="w-5 h-5 text-white" />}
+                      {idx === 1 && <Briefcase className="w-5 h-5 text-white" />}
+                      {idx === 2 && <CreditCard className="w-5 h-5 text-white" />}
+                      {idx === 3 && <School className="w-5 h-5 text-white" />}
+                      {idx === 4 && <CheckCircle className="w-5 h-5 text-white" />}
                     </div>
-                </CardContent>
-            </Card>
-        </div>
-    )
+                    <div className="flex flex-col text-left flex-1">
+                      <span
+                        className={`text-sm font-medium ${
+                          idx === 0 ? "text-blue-600" : "text-gray-800"
+                        }`}
+                      >
+                        {t}
+                      </span>
+                      <span className="text-xs text-gray-500 mt-0.5">
+                        {idx === 0 ? "In progress" : "Upcoming"}
+                      </span>
+                    </div>
+                  </div>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+
+          {/* Only Basic Details Form */}
+          <div className="bg-white p-8 mt-4 rounded-md border border-gray-100 shadow-sm">
+            <BasicDetails formik={formik} />
+          </div>
+
+          {/* Footer Buttons */}
+          <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
+            <Button
+              className="h-10 bg-red-500 hover:bg-red-600 text-white"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleSaveOnly}
+                disabled={isSubmitting}
+                className="h-10 px-6 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-300"
+              >
+                {isSubmitting ? "Saving..." : "Save"}
+              </Button>
+
+              <Button
+                onClick={handleSaveUpdate}
+                disabled={SubmitAndUpdating}
+                className="h-10 px-6 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-300"
+              >
+                {SubmitAndUpdating ? "Saving..." : "Next"}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }

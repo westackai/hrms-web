@@ -22,6 +22,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
 import Loader from "@/components/ui/loader"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 const data = [
   { id: 11, name: "Divya Sohani", img: "https://randomuser.me/api/portraits/women/65.jpg", department: "Software Development / Engineering", designation: "AI/Automation Developer", doj: "29 Sep 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
@@ -38,23 +48,43 @@ const data = [
 export default function EmployeesTable() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState<any>(null)
+  const [employees, setEmployees] = useState(data)
 
   const goAddEmployee = () => {
     setLoading(true)
-
     setTimeout(() => {
       router.push("/employees/add-employee")
     }, 700)
   }
 
+    const goEditEmployee = () => {
+    setLoading(true)
+    setTimeout(() => {
+      router.push("/employees/edit-employee")
+    }, 700)
+  }
+
+  const handleDeactivate = () => {
+    if (!selectedEmployee) return
+    setEmployees((prev) =>
+      prev.map((emp) =>
+        emp.id === selectedEmployee.id ? { ...emp, status: "Inactive" } : emp
+      )
+    )
+    setIsAlertOpen(false)
+  }
 
   return (
     <div className="w-full space-y-4 px-4 py-0">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">Employees </h1>
-            <Badge className="bg-blue-100 text-blue-700 border-none">10</Badge>
+            <h1 className="text-2xl font-bold tracking-tight">Employees</h1>
+            <Badge className="bg-blue-100 text-blue-700 border-none">
+              {employees.length}
+            </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
             Manage your employee database
@@ -67,11 +97,9 @@ export default function EmployeesTable() {
         >
           <Plus className="w-4 h-4 mr-2" /> Add Employee
         </Button>
-
       </div>
 
-
-      <div className="">
+      <div>
         <div className="bg-white border rounded-2xl shadow-sm border-gray-200 px-4">
           <div className="overflow-x-auto">
             <Table className="border-gray-200">
@@ -88,47 +116,88 @@ export default function EmployeesTable() {
               </TableHeader>
 
               <TableBody>
-                {data.map((row) => (
-                  <TableRow key={row.id} className="hover:bg-slate-50/40 h-[76px] border-gray-100">
+                {employees.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className="hover:bg-slate-50/40 h-[76px] border-gray-100"
+                  >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9 ring-2 ring-gray-100">
                           <AvatarImage src={row.img} />
-                          <AvatarFallback>{row.name.split(" ").map(n => n[0]).join("").toUpperCase()}</AvatarFallback>
+                          <AvatarFallback>
+                            {row.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <span className="font-medium text-sm text-gray-800">{row.name}</span>
-                          <span className="text-gray-500 text-[12px]">{row.designation}</span>
+                          <span className="font-medium text-sm text-gray-800">
+                            {row.name}
+                          </span>
+                          <span className="text-gray-500 text-[12px]">
+                            {row.designation}
+                          </span>
                         </div>
                       </div>
                     </TableCell>
 
-                    <TableCell className="text-gray-500 text-sm">{row.department}</TableCell>
-                    <TableCell className="text-gray-500 text-sm">{row.designation}</TableCell>
-                    <TableCell className="text-gray-500 text-sm">{row.doj}</TableCell>
-                    <TableCell className="text-gray-500 text-sm">{row.branch}</TableCell>
+                    <TableCell className="text-gray-500 text-sm">
+                      {row.department}
+                    </TableCell>
+                    <TableCell className="text-gray-500 text-sm">
+                      {row.designation}
+                    </TableCell>
+                    <TableCell className="text-gray-500 text-sm">
+                      {row.doj}
+                    </TableCell>
+                    <TableCell className="text-gray-500 text-sm">
+                      {row.branch}
+                    </TableCell>
 
                     <TableCell>
-                      <Badge className="bg-green-50 text-green-700 border-green-200 rounded-full px-3 py-1 text-xs font-medium">
-                        Active
+                      <Badge
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                          row.status === "Active"
+                            ? "bg-green-50 text-green-700 border-green-200"
+                            : "bg-red-50 text-red-700 border-red-200"
+                        }`}
+                      >
+                        {row.status}
                       </Badge>
                     </TableCell>
 
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>Edit Employee</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">Deactivate</DropdownMenuItem>
+                          {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
+                          <DropdownMenuItem
+                          onClick={goEditEmployee}
+                          >
+                            Edit Employee</DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => {
+                              setSelectedEmployee(row)
+                              setIsAlertOpen(true)
+                            }}
+                          >
+                            Deactivate
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
-
                   </TableRow>
                 ))}
               </TableBody>
@@ -138,17 +207,43 @@ export default function EmployeesTable() {
       </div>
 
       <div className="p-4 bg-slate-50/40 flex items-center justify-between text-sm text-muted-foreground border-gray-200">
-        <div>Showing 9 of 10 employees</div>
+        <div>
+          Showing {employees.length} of {employees.length} employees
+        </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>Previous</Button>
-          <Button variant="outline" size="sm">Next</Button>
+          <Button variant="outline" size="sm" disabled>
+            Previous
+          </Button>
+          <Button variant="outline" size="sm">
+            Next
+          </Button>
         </div>
       </div>
 
-
       {loading && <Loader />}
 
+      {/* === Deactivate Alert Dialog === */}
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will deactivate <b>{selectedEmployee?.name}</b> from the
+              employee list. You can’t undo this action.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDeactivate}
+            >
+              Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
