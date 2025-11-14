@@ -18,8 +18,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import Loader from "./ui/loader"
 
 export default function AppNavbar() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+
+  const handleLogout = () => {
+    setLoading(true);
+    router.push("/login");
+  };
+
   const notifications = [
     {
       id: 1,
@@ -187,13 +198,14 @@ export default function AppNavbar() {
 
             <DropdownMenuSeparator className="my-3"/>
 
-            <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-red-50 text-red-600">
-              <LogOut className="h-4 w-4 mr-2" /> Sign out
+            <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-red-50 text-red-600" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2"/> Sign out
             </DropdownMenuItem>
 
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {loading && <Loader />}
     </div>
   );
 }

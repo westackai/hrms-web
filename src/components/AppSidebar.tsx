@@ -27,13 +27,11 @@ export default function AppSidebar() {
         />
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <Link href="/dashboard">
             <img
               src="/logo_with_name.png"
               alt="WESTACK.ai Logo"
               className="w-8 h-8 rounded-lg object-contain"
             />
-            </Link>
             <Link href="/dashboard">
             <p className="font-semibold text-black text-[18px]">WESTACK.ai</p>
             </Link>
