@@ -57,8 +57,8 @@ export default function EmployeesTable() {
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null)
 
-  const goAddEmployee = () => router.push("/employees/add-employee")
-  const goEditEmployee = () => router.push("/employees/edit-employee")
+  const goAddEmployee = () => router.push("/administration/employees/add-employee")
+  const goEditEmployee = () => router.push("/administration/employees/edit-employee")
 
   const handleDeactivate = () => {
     if (!selectedEmployee) return

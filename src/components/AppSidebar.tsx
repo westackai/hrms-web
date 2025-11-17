@@ -12,6 +12,9 @@ export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const pathname = usePathname()
 
+  // Helper to check if a route is active
+  const isActive = (route: string) => pathname === route || pathname.startsWith(route + "/")
+
   return (
     <div
       className={clsx(
@@ -36,7 +39,6 @@ export default function AppSidebar() {
               <p className="font-semibold text-black text-[18px]">WESTACK.ai</p>
             </Link>
           </div>
-
         )}
       </div>
 
@@ -49,7 +51,7 @@ export default function AppSidebar() {
             className={clsx(
               "w-full justify-start flex gap-3 rounded-lg",
               collapsed && "justify-center",
-              pathname === "/dashboard"
+              isActive("/dashboard")
                 ? "bg-blue-100 text-blue-600 hover:bg-gray-100"
                 : " hover:bg-gray-100"
             )}
@@ -59,7 +61,7 @@ export default function AppSidebar() {
           </Button>
         </Link>
 
-        {/* configuration */}
+        {/* ===== CONFIGURATION ===== */}
         <Accordion type="single" collapsible className="mt-3 space-y-1">
           <AccordionItem value="configuration">
             <AccordionTrigger
@@ -79,81 +81,34 @@ export default function AppSidebar() {
 
             {!collapsed && (
               <AccordionContent className="pl-11 pt-2 flex flex-col gap-2 text-sm">
-                <Link href="/configuration/branch">
-                  <Button
-                    variant="ghost"
-                    className={clsx(
-                      "justify-start w-full",
-                      pathname === "/configuration/branch"
-                        ? "text-indigo-600 bg-blue-50"
-                        : "text-gray-700 hover:bg-gray-100"
-                    )}
-                  >
-                    Branch
-                  </Button>
-                </Link>
 
-                <Link href="/configuration/departments">
-                  <Button
-                    variant="ghost"
-                    className={clsx(
-                      "justify-start w-full",
-                      pathname === "/configuration/departments"
-                        ? "text-indigo-600 bg-blue-50"
-                        : "text-gray-700 hover:bg-gray-100"
-                    )}
-                  >
-                    Department
-                  </Button>
-                </Link>
+                {[
+                  { href: "/configuration/branch", label: "Branch" },
+                  { href: "/configuration/departments", label: "Department" },
+                  { href: "/configuration/designations", label: "Designation" },
+                  { href: "/configuration/shift", label: "Shift" },
+                  { href: "/configuration/employment-type", label: "Employment Type" },
+                ].map((item) => (
+                  <Link key={item.href} href={item.href}>
+                    <Button
+                      variant="ghost"
+                      className={clsx(
+                        "justify-start w-full",
+                        isActive(item.href)
+                          ? "text-indigo-600 bg-blue-50"
+                          : "text-gray-700 hover:bg-gray-100"
+                      )}
+                    >
+                      {item.label}
+                    </Button>
+                  </Link>
+                ))}
 
-                <Link href="/configuration/designations">
-                  <Button
-                    variant="ghost"
-                    className={clsx(
-                      "justify-start w-full",
-                      pathname === "/configuration/designations"
-                        ? "text-indigo-600 bg-blue-50"
-                        : "text-gray-700 hover:bg-gray-100"
-                    )}
-                  >
-                    Designation
-                  </Button>
-                </Link>
-
-                <Link href="/configuration/shift">
-                  <Button
-                    variant="ghost"
-                    className={clsx(
-                      "justify-start w-full",
-                      pathname === "/configuration/shift"
-                        ? "text-indigo-600 bg-blue-50"
-                        : "text-gray-700 hover:bg-gray-100"
-                    )}
-                  >
-                    Shift
-                  </Button>
-                </Link>
-
-                <Link href="/configuration/employment-type">
-                  <Button
-                    variant="ghost"
-                    className={clsx(
-                      "justify-start w-full",
-                      pathname === "/configuration/employment-type"
-                        ? "text-indigo-600 bg-blue-50"
-                        : "text-gray-700 hover:bg-gray-100"
-                    )}
-                  >
-                    Employment Type
-                  </Button>
-                </Link>
               </AccordionContent>
             )}
           </AccordionItem>
         </Accordion>
 
-       
         {/* ===== ADMINISTRATION ===== */}
         <Accordion type="single" collapsible className="mt-3 space-y-1">
           <AccordionItem value="administration">
@@ -175,13 +130,12 @@ export default function AppSidebar() {
             {!collapsed && (
               <AccordionContent className="pl-11 pt-2 flex flex-col gap-2 text-sm">
 
-                {/* EMPLOYEES inside Administration */}
                 <Link href="/administration/employees">
                   <Button
                     variant="ghost"
                     className={clsx(
                       "justify-start w-full",
-                      pathname === "/administration/employees"
+                      isActive("/administration/employees")
                         ? "text-indigo-600 bg-blue-50"
                         : "text-gray-700 hover:bg-gray-100"
                     )}

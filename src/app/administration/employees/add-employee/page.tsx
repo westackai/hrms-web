@@ -45,7 +45,7 @@ export default function AddEmployeePage() {
       await new Promise((r) => setTimeout(r, 700))
       localStorage.setItem("employeeBasic", JSON.stringify(values))
       toast.success("Employee added!", { position: "top-center" })
-      router.push("/employees/edit-employee")
+      router.push("/administration/employees/edit-employee")
     },
   })
 
