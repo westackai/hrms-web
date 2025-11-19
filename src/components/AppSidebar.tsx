@@ -61,6 +61,61 @@ export default function AppSidebar() {
           </Button>
         </Link>
 
+        {/* ===== ADMINISTRATION ===== */}
+        <Accordion type="single" collapsible className="mt-3 space-y-1">
+          <AccordionItem value="administration">
+            <AccordionTrigger
+              className={clsx(
+                "rounded-lg px-3 py-2 !no-underline hover:no-underline text-sm",
+                collapsed && "px-0 justify-center [&>svg:last-child]:hidden",
+                pathname.startsWith("/administration")
+                  ? "bg-blue-50 text-indigo-500"
+                  : ""
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <Settings2 className="w-5 h-5" />
+                {!collapsed && "Administration"}
+              </div>
+            </AccordionTrigger>
+
+            {!collapsed && (
+              <AccordionContent className="pl-11 pt-2 flex flex-col gap-2 text-sm">
+
+                <Link href="/administration/employees">
+                  <Button
+                    variant="ghost"
+                    className={clsx(
+                      "justify-start w-full",
+                      isActive("/administration/employees")
+                        ? "text-indigo-600 bg-blue-50"
+                        : "text-gray-700 hover:bg-gray-100"
+                    )}
+                  >
+                    Employees
+                  </Button>
+                </Link>
+
+                {/* Salary (NEW SUBMENU) */}
+                <Link href="/administration/salary">
+                  <Button
+                    variant="ghost"
+                    className={clsx(
+                      "justify-start w-full",
+                      isActive("/administration/salary")
+                        ? "text-indigo-600 bg-blue-50"
+                        : "text-gray-700 hover:bg-gray-100"
+                    )}
+                  >
+                    Salary
+                  </Button>
+                </Link>
+
+              </AccordionContent>
+            )}
+          </AccordionItem>
+        </Accordion>
+
         {/* ===== CONFIGURATION ===== */}
         <Accordion type="single" collapsible className="mt-3 space-y-1">
           <AccordionItem value="configuration">
@@ -103,46 +158,6 @@ export default function AppSidebar() {
                     </Button>
                   </Link>
                 ))}
-
-              </AccordionContent>
-            )}
-          </AccordionItem>
-        </Accordion>
-
-        {/* ===== ADMINISTRATION ===== */}
-        <Accordion type="single" collapsible className="mt-3 space-y-1">
-          <AccordionItem value="administration">
-            <AccordionTrigger
-              className={clsx(
-                "rounded-lg px-3 py-2 !no-underline hover:no-underline text-sm",
-                collapsed && "px-0 justify-center [&>svg:last-child]:hidden",
-                pathname.startsWith("/administration")
-                  ? "bg-blue-50 text-indigo-500"
-                  : ""
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <Settings2 className="w-5 h-5" />
-                {!collapsed && "Administration"}
-              </div>
-            </AccordionTrigger>
-
-            {!collapsed && (
-              <AccordionContent className="pl-11 pt-2 flex flex-col gap-2 text-sm">
-
-                <Link href="/administration/employees">
-                  <Button
-                    variant="ghost"
-                    className={clsx(
-                      "justify-start w-full",
-                      isActive("/administration/employees")
-                        ? "text-indigo-600 bg-blue-50"
-                        : "text-gray-700 hover:bg-gray-100"
-                    )}
-                  >
-                    Employees
-                  </Button>
-                </Link>
 
               </AccordionContent>
             )}

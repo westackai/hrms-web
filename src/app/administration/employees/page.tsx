@@ -70,7 +70,7 @@ export default function EmployeesTable() {
     setIsAlertOpen(false)
   }
 
-  // 🔍 Search + Filter + Sort Logic
+  // Search + Filter + Sort Logic
   const filteredEmployees = useMemo(() => {
     let list = [...employees]
 
@@ -100,7 +100,7 @@ export default function EmployeesTable() {
   return (
     <div className="w-full space-y-4 px-4">
 
-      {/* 🔥 Top Section */}
+      {/* Top Section */}
       <div className="flex items-center justify-between">
         <div>
           <div className="flex gap-2">
@@ -119,7 +119,7 @@ export default function EmployeesTable() {
         </Button>
       </div>
 
-      {/* 🔍 Search + Filter + Sort Bar */}
+      {/* Search + Filter + Sort Bar */}
       <div className="flex flex-wrap gap-3 p-4">
 
         {/* Search */}

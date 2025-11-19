@@ -172,7 +172,7 @@ export default function AppNavbar() {
             </div>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="w-64 p-4 rounded-2xl shadow-xl border bg-white mt-2">
+          <DropdownMenuContent align="end" className="w-64 p-4 rounded-2xl shadow-xl border bg-white mt-5">
             {/* profile top */}
             <div className="flex items-center gap-3 mb-3">
               <Avatar className="h-10 w-10 border">
