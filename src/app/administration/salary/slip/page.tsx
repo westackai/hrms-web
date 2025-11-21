@@ -12,7 +12,7 @@ export default function SalarySlip() {
       {/* Company Header */}
       <div className="flex flex-col items-center text-center mb-6">
         <Image
-          src="/logo_with_name.png"  // <-- replace with actual logo
+          src="/logo_with_name.png" 
           alt="Company Logo"
           width={70}
           height={70}

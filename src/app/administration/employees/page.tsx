@@ -35,15 +35,15 @@ import { useRouter } from "next/navigation"
 
 // your same data...
 const data = [
-  { id: 11, name: "Divya Sohani", img: "https://randomuser.me/api/portraits/women/65.jpg", department: "Software Development / Engineering", designation: "AI/Automation Developer", doj: "29 Sep 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 10, name: "Deepak Mishra", img: "https://randomuser.me/api/portraits/men/76.jpg", department: "Software Development / Engineering", designation: "Full Stack Developer", doj: "01 Feb 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 9, name: "Rajat Saraswat", img: "https://randomuser.me/api/portraits/men/14.jpg", department: "Software Development / Engineering", designation: "Full Stack Developer", doj: "01 Feb 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 8, name: "Utkarsh Nagnath Gaikwad", img: "https://randomuser.me/api/portraits/men/91.jpg", department: "Software Development / Engineering", designation: "Frontend Developer", doj: "-", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 7, name: "Nitin Chouhan", img: "https://randomuser.me/api/portraits/men/54.jpg", department: "Software Development / Engineering", designation: "Backend Developer", doj: "10 Sep 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 6, name: "Nitin Batham", img: "https://randomuser.me/api/portraits/men/33.jpg", department: "Software Development / Engineering", designation: "Business Development Executive", doj: "14 Jul 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 5, name: "Mohit Rathore", img: "https://randomuser.me/api/portraits/men/19.jpg", department: "Software Development / Engineering", designation: "Backend Developer", doj: "02 Jan 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 4, name: "Kanha Choubey", img: "https://randomuser.me/api/portraits/women/29.jpg", department: "Software Development / Engineering", designation: "Frontend Developer", doj: "01 Apr 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
-  { id: 2, name: "Abhishekh Ojha", img: "https://randomuser.me/api/portraits/men/81.jpg", department: "Software Development / Engineering", designation: "Frontend Developer", doj: "01 Jul 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 11, name: "Divya Sohani", img: "https://randomuser.me/api/portraits/women/65.jpg", department: "Software Development ", designation: "AI/Automation Developer", doj: "29 Sep 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 10, name: "Deepak Mishra", img: "https://randomuser.me/api/portraits/men/76.jpg", department: "Software Development ", designation: "Full Stack Developer", doj: "01 Feb 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 9, name: "Rajat Saraswat", img: "https://randomuser.me/api/portraits/men/14.jpg", department: "Software Development ", designation: "Full Stack Developer", doj: "01 Feb 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 8, name: "Utkarsh Nagnath Gaikwad", img: "https://randomuser.me/api/portraits/men/91.jpg", department: "Software Development ", designation: "Frontend Developer", doj: "-", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 7, name: "Nitin Chouhan", img: "https://randomuser.me/api/portraits/men/54.jpg", department: "Software Development ", designation: "Backend Developer", doj: "10 Sep 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 6, name: "Nitin Batham", img: "https://randomuser.me/api/portraits/men/33.jpg", department: "Software Development ", designation: "Business Development Executive", doj: "14 Jul 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 5, name: "Mohit Rathore", img: "https://randomuser.me/api/portraits/men/19.jpg", department: "Software Development ", designation: "Backend Developer", doj: "02 Jan 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 4, name: "Kanha Choubey", img: "https://randomuser.me/api/portraits/women/29.jpg", department: "Software Development ", designation: "Frontend Developer", doj: "01 Apr 2024", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
+  { id: 2, name: "Abhishekh Ojha", img: "https://randomuser.me/api/portraits/men/81.jpg", department: "Software Development ", designation: "Frontend Developer", doj: "01 Jul 2025", branch: "WESTACK SOLUTIONS LLP", status: "Active" },
 ]
 
 
@@ -148,7 +148,7 @@ export default function EmployeesTable() {
         {/* Sort Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button  className="flex gap-2 p-5 border border-gray-300">
+            <Button className="flex gap-2 p-5 border border-gray-300">
               <ArrowUpDown className="h-4 w-4" />
               Sort By
             </Button>
@@ -163,17 +163,18 @@ export default function EmployeesTable() {
       </div>
 
       {/* TABLE */}
-      <div className="bg-white border rounded-2xl shadow-sm border-gray-200 px-4">
+      <div className="bg-white border rounded-2xl shadow-sm border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-gray-100">
-                <TableHead>User</TableHead>
+              <TableRow className="border-b border-gray-100 h-[56px] bg-blue-100">
+                <TableHead className="text-center w-20">ID</TableHead>
+                <TableHead>Employees</TableHead>
                 <TableHead>Department</TableHead>
                 <TableHead>Designation</TableHead>
-                <TableHead>Date Of Joining</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="pr-2">Date Of Joining</TableHead>
+                <TableHead className="text-center">Branch</TableHead>
+                <TableHead className="text-center">Status</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
@@ -181,6 +182,10 @@ export default function EmployeesTable() {
             <TableBody>
               {filteredEmployees.map((row) => (
                 <TableRow key={row.id} className="hover:bg-slate-50/40 h-[76px] border-gray-100">
+
+                  <TableCell className="text-center font-semibold text-gray-700">
+                    {row.id}
+                  </TableCell>
 
                   {/* User */}
                   <TableCell>
@@ -207,8 +212,8 @@ export default function EmployeesTable() {
                   <TableCell>
                     <Badge
                       className={`rounded-full px-3 py-1 text-xs font-medium ${row.status === "Active"
-                          ? "bg-green-50 text-green-700 border-green-200"
-                          : "bg-red-50 text-red-700 border-red-200"
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-red-50 text-red-700 border-red-200"
                         }`}
                     >
                       {row.status}

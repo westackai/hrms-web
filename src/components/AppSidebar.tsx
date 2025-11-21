@@ -69,7 +69,7 @@ export default function AppSidebar() {
                 "rounded-lg px-3 py-2 !no-underline hover:no-underline text-sm",
                 collapsed && "px-0 justify-center [&>svg:last-child]:hidden",
                 pathname.startsWith("/administration")
-                  ? "bg-blue-50 text-indigo-500"
+                  ? "bg-blue-50 text-blue-500"
                   : ""
               )}
             >
@@ -88,7 +88,7 @@ export default function AppSidebar() {
                     className={clsx(
                       "justify-start w-full",
                       isActive("/administration/employees")
-                        ? "text-indigo-600 bg-blue-50"
+                        ? "text-blue-600 bg-blue-50"
                         : "text-gray-700 hover:bg-gray-100"
                     )}
                   >
@@ -103,7 +103,7 @@ export default function AppSidebar() {
                     className={clsx(
                       "justify-start w-full",
                       isActive("/administration/salary")
-                        ? "text-indigo-600 bg-blue-50"
+                        ? "text-blue-600 bg-blue-50"
                         : "text-gray-700 hover:bg-gray-100"
                     )}
                   >
@@ -124,7 +124,7 @@ export default function AppSidebar() {
                 "rounded-lg px-3 py-2 !no-underline hover:no-underline text-sm",
                 collapsed && "px-0 justify-center [&>svg:last-child]:hidden",
                 pathname.startsWith("/configuration")
-                  ? "bg-blue-50 text-indigo-500"
+                  ? "bg-blue-50 text-blue-500"
                   : ""
               )}
             >
@@ -150,7 +150,7 @@ export default function AppSidebar() {
                       className={clsx(
                         "justify-start w-full",
                         isActive(item.href)
-                          ? "text-indigo-600 bg-blue-50"
+                          ? "text-blue-600 bg-blue-50"
                           : "text-gray-700 hover:bg-gray-100"
                       )}
                     >
