@@ -10,7 +10,7 @@ import {
     PopoverTrigger,
     PopoverContent,
 } from "@/components/ui/popover";
-import { CalendarIcon, ArrowLeft, User, Briefcase, DollarSign, ChevronRight } from "lucide-react";
+import { CalendarIcon, ArrowLeft, Briefcase, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 
 export default function SalaryUpdatePage() {
     const [effectiveDate, setEffectiveDate] = useState<Date | undefined>();
-    const router = useRouter()
+    const router = useRouter();
 
     const salaryKeys = ["basic", "hra", "conveyance", "utility"] as const;
     const deductionKeys = [
@@ -32,22 +32,6 @@ export default function SalaryUpdatePage() {
 
     type SalaryKey = typeof salaryKeys[number];
     type DeductionKey = typeof deductionKeys[number];
-    type FieldKey = SalaryKey | DeductionKey;
-
-    const defaultCheckState: Record<FieldKey, boolean> = {
-        basic: true,
-        hra: false,
-        conveyance: false,
-        utility: false,
-        pf: false,
-        esic: false,
-        professionalTax: false,
-        incomeTax: false,
-        loan: false,
-        healthInsurance: false,
-    };
-
-    const [fields, setFields] = useState<Record<FieldKey, boolean>>(defaultCheckState);
 
     const [salaryValues, setSalaryValues] = useState<Record<SalaryKey, string>>({
         basic: "",
@@ -68,7 +52,6 @@ export default function SalaryUpdatePage() {
 
     // Number validation function
     const handleNumberInput = (value: string) => {
-        // Allow empty string, numbers, and decimal point
         const regex = /^\d*\.?\d*$/;
         return regex.test(value) ? value : "";
     };
@@ -95,7 +78,6 @@ export default function SalaryUpdatePage() {
     const [note, setNote] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
 
-
     const handleSave = async () => {
         if (!effectiveDate) {
             toast.error("Please select an effective date", { position: "top-center" });
@@ -108,7 +90,7 @@ export default function SalaryUpdatePage() {
         }
 
         try {
-            setIsUpdating(true); // Start loading
+            setIsUpdating(true);
 
             const payload = {
                 employee: {
@@ -132,74 +114,58 @@ export default function SalaryUpdatePage() {
 
             console.log("SALARY UPDATE PAYLOAD:", payload);
 
-            // Simulate API call delay (optional)
             await new Promise((res) => setTimeout(res, 1500));
 
             toast.success("Salary Updated Successfully!", { position: "top-center" });
         } catch {
             toast.error("Error updating salary!", { position: "top-center" });
         } finally {
-            setIsUpdating(false); // Restore button state
+            setIsUpdating(false);
         }
     };
 
-
-    const RenderField = (label: string, key: FieldKey) => {
-        const isSalary = salaryKeys.includes(key as SalaryKey);
-        const value = isSalary
-            ? salaryValues[key as SalaryKey]
-            : deductionValues[key as DeductionKey];
-
-        const onChange = (e: any) => {
-            const validValue = handleNumberInput(e.target.value);
-
-            if (isSalary) {
-                setSalaryValues({
-                    ...salaryValues,
-                    [key]: validValue,
-                });
-            } else {
-                setDeductionValues({
-                    ...deductionValues,
-                    [key]: validValue,
-                });
-            }
-        };
-
+    const RenderSalaryField = (label: string, key: SalaryKey, required = false) => {
         return (
             <div className="space-y-2">
-                {key !== "basic" && (
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            checked={fields[key]}
-                            onChange={() =>
-                                setFields({ ...fields, [key]: !fields[key] })
-                            }
-                            className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                        />
-                        <Label className="text-sm font-medium text-gray-700">{label}</Label>
-                    </div>
-                )}
-
-                {key === "basic" && (
-                    <Label className="text-sm font-medium text-gray-700">
-                        {label} <span className="text-red-500">*</span>
-                    </Label>
-                )}
-
+                <Label className="text-sm font-medium text-gray-700">
+                    {label} {required && <span className="text-red-500">*</span>}
+                </Label>
                 <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
                     <Input
-                        value={value}
-                        disabled={!fields[key]}
-                        onChange={onChange}
+                        value={salaryValues[key]}
+                        onChange={(e) => {
+                            const validValue = handleNumberInput(e.target.value);
+                            setSalaryValues({
+                                ...salaryValues,
+                                [key]: validValue,
+                            });
+                        }}
                         placeholder="0.00"
-                        className={cn(
-                            "h-11 pl-8 transition-all",
-                            !fields[key] && "bg-gray-50 cursor-not-allowed",
-                            fields[key] && "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                        )}
+                        className="h-11 pl-8 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    />
+                </div>
+            </div>
+        );
+    };
+
+    const RenderDeductionField = (label: string, key: DeductionKey) => {
+        return (
+            <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">{label}</Label>
+                <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                    <Input
+                        value={deductionValues[key]}
+                        onChange={(e) => {
+                            const validValue = handleNumberInput(e.target.value);
+                            setDeductionValues({
+                                ...deductionValues,
+                                [key]: validValue,
+                            });
+                        }}
+                        placeholder="0.00"
+                        className="h-11 pl-8 border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200"
                     />
                 </div>
             </div>
@@ -209,7 +175,6 @@ export default function SalaryUpdatePage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 p-8">
             <div className="max-w-6xl mx-auto">
-
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-8">
                     <Button
@@ -285,7 +250,6 @@ export default function SalaryUpdatePage() {
 
                 {/* Main Form Card */}
                 <div className="bg-white shadow-lg border border-gray-200 rounded-2xl p-8 space-y-8">
-
                     {/* Effective Date */}
                     <div className="pb-6 border-b border-gray-200">
                         <Label className="text-sm font-semibold text-gray-700 mb-3 block">
@@ -318,58 +282,61 @@ export default function SalaryUpdatePage() {
                         </Popover>
                     </div>
 
-                    {/* Earnings Section */}
-                    <div>
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="h-8 w-1 bg-blue-600 rounded-full"></div>
-                            <h2 className="text-xl font-bold text-gray-800">Earnings</h2>
-                        </div>
+                    {/* Earnings and Deductions Side by Side */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Earnings Section */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="h-8 w-1 bg-blue-600 rounded-full"></div>
+                                <h2 className="text-xl font-bold text-gray-800">Earnings</h2>
+                            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            {RenderField("Basic Salary", "basic")}
-                            {RenderField("House Rent Allowance (HRA)", "hra")}
-                            {RenderField("Conveyance Allowance", "conveyance")}
-                            {RenderField("Utility Allowance", "utility")}
-                        </div>
+                            <div className="space-y-6 mb-6">
+                                {RenderSalaryField("Basic Salary", "basic", true)}
+                                {RenderSalaryField("House Rent Allowance (HRA)", "hra")}
+                                {RenderSalaryField("Conveyance Allowance", "conveyance")}
+                                {RenderSalaryField("Utility Allowance", "utility")}
+                            </div>
 
-                        <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 p-5 rounded-xl border border-blue-200">
-                            <Label className="text-sm font-semibold text-gray-700 mb-2 block">Gross Earning</Label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-700 font-semibold">₹</span>
-                                <Input
-                                    disabled
-                                    value={parseFloat(grossEarning).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    className="bg-white border-blue-200 h-12 pl-8 font-semibold text-blue-700 text-lg"
-                                />
+                            <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 p-5 rounded-xl border border-blue-200">
+                                <Label className="text-sm font-semibold text-gray-700 mb-2 block">Gross Earning</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-700 font-semibold">₹</span>
+                                    <Input
+                                        disabled
+                                        value={parseFloat(grossEarning).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        className="bg-white border-blue-200 h-12 pl-8 font-semibold text-blue-700 text-lg"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Deductions Section */}
-                    <div>
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="h-8 w-1 bg-red-600 rounded-full"></div>
-                            <h2 className="text-xl font-bold text-gray-800">Deductions</h2>
-                        </div>
+                        {/* Deductions Section */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-6">
+                                <div className="h-8 w-1 bg-red-600 rounded-full"></div>
+                                <h2 className="text-xl font-bold text-gray-800">Deductions</h2>
+                            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            {RenderField("Provident Fund", "pf")}
-                            {RenderField("ESIC", "esic")}
-                            {RenderField("Professional Tax", "professionalTax")}
-                            {RenderField("Income Tax", "incomeTax")}
-                            {RenderField("Loan / Advance", "loan")}
-                            {RenderField("Health Insurance", "healthInsurance")}
-                        </div>
+                            <div className="space-y-6 mb-6">
+                                {RenderDeductionField("Provident Fund", "pf")}
+                                {RenderDeductionField("ESIC", "esic")}
+                                {RenderDeductionField("Professional Tax", "professionalTax")}
+                                {RenderDeductionField("Income Tax", "incomeTax")}
+                                {RenderDeductionField("Loan / Advance", "loan")}
+                                {RenderDeductionField("Health Insurance", "healthInsurance")}
+                            </div>
 
-                        <div className="bg-gradient-to-r from-red-50 to-red-100/50 p-5 rounded-xl border border-red-200">
-                            <Label className="text-sm font-semibold text-gray-700 mb-2 block">Total Deductions</Label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-red-700 font-semibold">₹</span>
-                                <Input
-                                    disabled
-                                    value={parseFloat(totalDeductions).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    className="bg-white border-red-200 h-12 pl-8 font-semibold text-red-700 text-lg"
-                                />
+                            <div className="bg-gradient-to-r from-red-50 to-red-100/50 p-5 rounded-xl border border-red-200">
+                                <Label className="text-sm font-semibold text-gray-700 mb-2 block">Total Deductions</Label>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-red-700 font-semibold">₹</span>
+                                    <Input
+                                        disabled
+                                        value={parseFloat(totalDeductions).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        className="bg-white border-red-200 h-12 pl-8 font-semibold text-red-700 text-lg"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -424,7 +391,6 @@ export default function SalaryUpdatePage() {
                         >
                             {isUpdating ? "Updating..." : "Update Salary"}
                         </Button>
-
                     </div>
                 </div>
             </div>
