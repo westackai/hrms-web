@@ -186,7 +186,7 @@ export default function AppNavbar() {
             </div>
 
             <DropdownMenuGroup className="space-y-1">
-              <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-gray-50">
+              <DropdownMenuItem className="cursor-pointer rounded-lg hover:bg-gray-50"  onClick={() => router.push("/profile")}>
                 <User className="h-4 w-4 mr-2 text-gray-600" /> Edit profile
               </DropdownMenuItem>
 

@@ -40,9 +40,7 @@ export default function LayoutProvider({
     );
   }
 
-  // -------------------------------------------------------
   // NORMAL PAGES → SIDEBAR + NAVBAR + MAIN LOADER
-  // -------------------------------------------------------
   return (
     <div className="flex">
       {/* Sidebar */}
