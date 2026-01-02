@@ -13,7 +13,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-type BranchFormDialogProps = {
+/* ================= TYPES ================= */
+
+type DepartmentFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (name: string) => void
@@ -21,27 +23,28 @@ type BranchFormDialogProps = {
   mode: "create" | "edit"
 }
 
+/* ================= COMPONENT ================= */
 
-export default function BranchFormDialog({
+export default function DepartmentFormDialog({
   open,
   onOpenChange,
   onSubmit,
   initialData,
   mode,
-}: BranchFormDialogProps) {
-  const [branchName, setBranchName] = useState("")
+}: DepartmentFormDialogProps) {
+  const [departmentName, setDepartmentName] = useState("")
 
   useEffect(() => {
     if (initialData?.name) {
-      setBranchName(initialData.name)
+      setDepartmentName(initialData.name)
     } else {
-      setBranchName("")
+      setDepartmentName("")
     }
   }, [initialData, open])
 
   const handleSubmit = () => {
-    if (!branchName.trim()) return
-    onSubmit(branchName.trim())
+    if (!departmentName.trim()) return
+    onSubmit(departmentName.trim())
     onOpenChange(false)
   }
 
@@ -50,25 +53,25 @@ export default function BranchFormDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            {mode === "create" ? "Create New Branch" : "Edit Branch"}
+            {mode === "create" ? "Create New Department" : "Edit Department"}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {mode === "create"
-              ? "Add a new branch to your organization. Fill in the details below."
-              : "Update the branch name and save your changes."}
+              ? "Add a new department to your organization. Fill in the details below."
+              : "Update the department name and save your changes."}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="branch-name" className="text-sm font-medium">
-              Branch Name <span className="text-red-500">*</span>
+            <Label htmlFor="department-name" className="text-sm font-medium">
+              Department Name <span className="text-red-500">*</span>
             </Label>
             <Input
-              id="branch-name"
-              placeholder="e.g., Pune Office"
-              value={branchName}
-              onChange={(e) => setBranchName(e.target.value)}
+              id="department-name"
+              placeholder="e.g., Software Development"
+              value={departmentName}
+              onChange={(e) => setDepartmentName(e.target.value)}
               className="w-full focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -79,7 +82,7 @@ export default function BranchFormDialog({
             variant="outline"
             onClick={() => {
               onOpenChange(false)
-              setBranchName("")
+              setDepartmentName("")
             }}
           >
             Cancel
@@ -87,9 +90,9 @@ export default function BranchFormDialog({
           <Button
             className="bg-blue-600 hover:bg-blue-700 text-white"
             onClick={handleSubmit}
-            disabled={!branchName.trim()}
+            disabled={!departmentName.trim()}
           >
-            {mode === "create" ? "Add Branch" : "Update Branch"}
+            {mode === "create" ? "Add Department" : "Update Department"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -10,7 +10,7 @@ export const postRequest = (url: any, payload?: any) => {
 };
 
 
-export const putRequest = (url: any, payload: any) => {
+export const putRequest = (url: any, payload?: any) => {
   return axiosClient.put(url, payload);
 };
 

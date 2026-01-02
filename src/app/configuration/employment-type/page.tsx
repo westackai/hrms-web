@@ -19,6 +19,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
 
 import EmploymentTypeFormDialog from "@/components/employment/EmploymentTypeFormDialog"
 
@@ -86,42 +95,42 @@ export default function EmploymentTypesPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white border rounded-2xl shadow-sm border-gray-200">
+        <div className="bg-white border rounded-2xl shadow-sm border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-slate-50/40">
-                  <th className="px-5 py-4 text-left font-medium text-gray-500 text-sm">
+            <Table className="w-full">
+              <TableHeader>
+                <TableRow className="border-b border-gray-100 bg-blue-100 h-[56px]">
+                  <TableHead className="px-5 py-4 text-left font-medium text-gray-500 text-sm">
                     Employment Type
-                  </th>
-                  <th className="px-5 py-4 text-center font-medium text-gray-500 text-sm">
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-center font-medium text-gray-500 text-sm">
                     Employee Count
-                  </th>
-                  <th className="px-5 py-4 text-center font-medium text-gray-500 text-sm w-32">
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-center font-medium text-gray-500 text-sm w-32">
                     Action
-                  </th>
-                </tr>
-              </thead>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
 
-              <tbody>
+              <TableBody>
                 {types.map((type) => (
-                  <tr
+                  <TableRow
                     key={type.id}
                     className="border-b border-gray-100 hover:bg-slate-50/40 h-[68px]"
                   >
-                    <td className="px-5 py-4">
+                    <TableCell className="px-5 py-4">
                       <span className="font-medium text-sm text-gray-800">
                         {type.name}
                       </span>
-                    </td>
+                    </TableCell>
 
-                    <td className="px-5 py-4 text-center">
+                    <TableCell className="px-5 py-4 text-center">
                       <span className="text-sm text-gray-600 font-medium">
                         {type.employeeCount}
                       </span>
-                    </td>
+                    </TableCell>
 
-                    <td className="px-5 py-4">
+                    <TableCell className="px-5 py-4">
                       <div className="flex items-center justify-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -133,6 +142,7 @@ export default function EmploymentTypesPage() {
                               <MoreVertical className="h-4 w-4 text-gray-600" />
                             </Button>
                           </DropdownMenuTrigger>
+
                           <DropdownMenuContent
                             align="end"
                             className="w-40 bg-white border border-gray-200 shadow-lg rounded-xl p-1"
@@ -147,6 +157,7 @@ export default function EmploymentTypesPage() {
                             >
                               <Pencil className="h-4 w-4 mr-2" /> Edit
                             </DropdownMenuItem>
+
                             <DropdownMenuItem
                               className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
                               onClick={() => {
@@ -159,11 +170,12 @@ export default function EmploymentTypesPage() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
+
           </div>
         </div>
       </div>

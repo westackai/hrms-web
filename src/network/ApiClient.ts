@@ -30,7 +30,7 @@ axiosClient.interceptors.request.use(
    RESPONSE INTERCEPTOR
 ============================ */
 axiosClient.interceptors.response.use(
-  (response) => response.data,
+  (response:any) => response.data,
   (error: AxiosError<any>) => {
     const message =
       error.response?.data?.message ||

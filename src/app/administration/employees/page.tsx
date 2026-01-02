@@ -180,7 +180,7 @@ export default function EmployeesTable() {
       {/* TABLE */}
       <div className="bg-white border rounded-xl shadow-sm border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <Table>
+          <Table className="w-full">
             <TableHeader>
               <TableRow className="border-b border-gray-100 h-[56px] bg-blue-100">
                 <TableHead className="pl-8">Employees</TableHead>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -19,47 +19,131 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-
+import toast from "react-hot-toast"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import BranchFormDialog from "@/components/branch/BranchFormDialog"
+import {
+  showAllBranches,
+  createBranch,
+  updateBranch,
+  deleteBranch,
+} from "@/network/Api"
 
-const branchesData = [
-  { id: 1, name: "Pune Office", employeeCount: 25 },
-  { id: 2, name: "Mumbai Office", employeeCount: 40 },
-]
+/* ---------------- TYPES ---------------- */
+
+type Branch = {
+  id: string;
+  name: string;
+  emp_count: number;
+}
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function BranchesPage() {
-  const [branches, setBranches] = useState(branchesData)
+  const [branches, setBranches] = useState<Branch[]>([])
+  const [loading, setLoading] = useState(true)
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedBranch, setSelectedBranch] = useState<any>(null)
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create")
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
 
-  const handleCreateBranch = (name: string) => {
-    const newBranch = {
-      id: branches.length + 1,
-      name,
-      employeeCount: 0,
+  /* ---------------- FETCH ---------------- */
+
+  const fetchBranches = async () => {
+    try {
+      setLoading(true)
+      const res = await showAllBranches()
+      if (res?.data) {
+        setBranches(
+          res.data.map((b: any) => ({
+            id: b.id,
+            name: b.name,
+            emp_count: b.emp_count,
+          }))
+        )
+      }
+    } catch {
+      toast.error("Failed to fetch branches")
+    } finally {
+      setLoading(false)
     }
-    setBranches([...branches, newBranch])
   }
 
-  const handleUpdateBranch = (name: string) => {
-    if (!selectedBranch) return
-    const updated = branches.map((b) =>
-      b.id === selectedBranch.id ? { ...b, name } : b
-    )
-    setBranches(updated)
+  useEffect(() => {
+    fetchBranches()
+  }, [])
+
+  /* ---------------- CREATE ---------------- */
+
+  const handleCreateBranch = async (name: string) => {
+    try {
+      const res = await createBranch({ name })
+      if (res) {
+        setBranches((prev) => [
+          ...prev,
+          {
+            id: res.data.id,
+            name: res.data.name,
+            emp_count: res.data.emp_count,
+
+          },
+        ])
+        // toast.success(res.message)
+      }
+    } catch {
+      toast.error("Failed to create branch")
+    }
   }
 
-  const handleDeleteBranch = () => {
+  /* ---------------- UPDATE ---------------- */
+
+  const handleUpdateBranch = async (name: string) => {
     if (!selectedBranch) return
-    setBranches(branches.filter((b) => b.id !== selectedBranch.id))
-    setIsDeleteAlertOpen(false)
+    try {
+      const res = await updateBranch(selectedBranch.id, { name })
+      if (res) {
+        setBranches((prev) =>
+          prev.map((b) =>
+            b.id === selectedBranch.id ? { ...b, name: res.data.name } : b
+          )
+        )
+        toast.success("Branch updated successfully")
+        console.log(res);
+      }
+    } catch {
+      toast.error("Failed to update branch")
+    }
+  }
+
+  /* ---------------- DELETE ---------------- */
+
+  const handleDeleteBranch = async () => {
+    if (!selectedBranch) return
+    try {
+      const res = await deleteBranch(selectedBranch.id)
+      if (res?.data) {
+        setBranches((prev) =>
+          prev.filter((b) => b.id !== selectedBranch.id)
+        )
+        toast.success("Branch deleted successfully")
+      }
+    } catch {
+      toast.error("Failed to delete branch")
+    } finally {
+      setIsDeleteAlertOpen(false)
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* ===== Main Content ===== */}
       <div className="flex-grow w-full space-y-4 p-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -83,108 +167,105 @@ export default function BranchesPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white border rounded-2xl shadow-sm border-gray-200">
+        <div className="bg-white border rounded-2xl shadow-sm border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-slate-50/40">
-                  <th className="px-5 py-4 text-left font-medium text-gray-500 text-sm">
+            <Table className="w-full">
+              <TableHeader>
+                <TableRow className="border-b border-gray-100 h-[56px] bg-blue-100">
+                  <TableHead className="px-5 py-4 text-left font-medium  text-sm">
                     Name
-                  </th>
-                  <th className="px-5 py-4 text-center font-medium text-gray-500 text-sm">
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-center font-medium text-sm">
                     Employee Count
-                  </th>
-                  <th className="px-5 py-4 text-center font-medium text-gray-500 text-sm w-32">
+                  </TableHead>
+                  <TableHead className="px-5 py-4 text-center font-medium text-sm w-32">
                     Action
-                  </th>
-                </tr>
-              </thead>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
 
-              <tbody>
-                {branches.map((branch) => (
-                  <tr
-                    key={branch.id}
-                    className="border-b border-gray-100 hover:bg-slate-50/40 h-[68px]"
-                  >
-                    <td className="px-5 py-4">
-                      <span className="font-medium text-sm text-gray-800">
+              <TableBody>
+                {loading
+                  ? Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i} className="h-[68px]">
+                      <TableCell className="px-5 py-4">
+                        <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
+                      </TableCell>
+                      <TableCell className="px-5 py-4 text-center">
+                        <div className="h-4 w-10 bg-gray-200 rounded mx-auto animate-pulse" />
+                      </TableCell>
+                      <TableCell className="px-5 py-4 text-center">
+                        <div className="h-8 w-8 bg-gray-200 rounded mx-auto animate-pulse" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                  : branches.map((branch) => (
+                    <TableRow
+                      key={branch.id}
+                      className="border-b border-gray-100 hover:bg-slate-50/40 h-[68px]"
+                    >
+                      <TableCell className="px-5 py-4 font-medium text-sm text-gray-800">
                         {branch.name}
-                      </span>
-                    </td>
+                      </TableCell>
 
-                    <td className="px-5 py-4 text-center">
-                      <span className="text-sm text-gray-600 font-medium">
-                        {branch.employeeCount}
-                      </span>
-                    </td>
+                      <TableCell className="px-5 py-4 text-center text-sm font-medium text-gray-600">
+                        {branch.emp_count}
+                      </TableCell>
 
-                    <td className="px-5 py-4">
-                      <div className="flex items-center justify-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-gray-100"
+                      <TableCell className="px-5 py-4">
+                        <div className="flex items-center justify-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-gray-100"
+                              >
+                                <MoreVertical className="h-4 w-4 text-gray-600" />
+                              </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent
+                              align="end"
+                              className="w-40 bg-white border border-gray-200 shadow-lg rounded-xl p-1"
                             >
-                              <MoreVertical className="h-4 w-4 text-gray-600" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="w-40 bg-white border border-gray-200 shadow-lg rounded-xl p-1"
-                          >
-                            <DropdownMenuItem
-                              className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
-                              onClick={() => {
-                                setSelectedBranch(branch)
-                                setDialogMode("edit")
-                                setIsDialogOpen(true)
-                              }}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
-                              onClick={() => {
-                                setSelectedBranch(branch)
-                                setIsDeleteAlertOpen(true)
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedBranch(branch)
+                                  setDialogMode("edit")
+                                  setIsDialogOpen(true)
+                                }}
+                              >
+                                <Pencil className="h-4 w-4 mr-2" /> Edit
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedBranch(branch)
+                                  setIsDeleteAlertOpen(true)
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" /> Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+
           </div>
         </div>
       </div>
 
-      {/* ===== Sticky Footer ===== */}
-      <div className="p-4 bg-slate-50/40 flex items-center justify-between text-sm text-muted-foreground border-t border-gray-200 mt-auto">
-        <div>Showing {branches.length} of {branches.length} branches</div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
-            Previous
-          </Button>
-          <Button variant="outline" size="sm" disabled>
-            Next
-          </Button>
-        </div>
-      </div>
-
-      {/* ===== Dialogs ===== */}
+      {/* Dialogs */}
       <BranchFormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
-        initialData={selectedBranch}
+        initialData={selectedBranch ?? undefined}
         onSubmit={(name) =>
           dialogMode === "create"
             ? handleCreateBranch(name)
@@ -197,7 +278,7 @@ export default function BranchesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this branch.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
