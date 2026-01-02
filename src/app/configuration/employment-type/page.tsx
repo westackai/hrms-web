@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -27,50 +27,134 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import toast from "react-hot-toast"
 
-
+import {
+  showAllEmploymentTypes,
+  createEmploymentType,
+  updateEmploymentType,
+  deleteEmploymentType,
+} from "@/network/Api"
 import EmploymentTypeFormDialog from "@/components/employment/EmploymentTypeFormDialog"
 
-const defaultEmploymentTypes = [
-  { id: 1, name: "Full-Time", employeeCount: 85 },
-  { id: 2, name: "Part-Time", employeeCount: 30 },
-  { id: 3, name: "Intern", employeeCount: 12 },
-]
+/* ---------------- TYPES ---------------- */
+
+type EmploymentType = {
+  id: string
+  name: string
+  emp_count: number
+}
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function EmploymentTypesPage() {
-  const [types, setTypes] = useState(defaultEmploymentTypes)
+  const [types, setTypes] = useState<EmploymentType[]>([])
+  const [loading, setLoading] = useState(true)
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedType, setSelectedType] = useState<any>(null)
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create")
+  const [selectedType, setSelectedType] =
+    useState<EmploymentType | null>(null)
+
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
 
-  const handleCreateType = (name: string) => {
-    const newType = {
-      id: types.length + 1,
-      name,
-      employeeCount: 0,
+  /* ---------------- FETCH ---------------- */
+
+  const fetchEmploymentTypes = async () => {
+    try {
+      setLoading(true)
+      const res = await showAllEmploymentTypes()
+
+      if (res?.data) {
+        setTypes(
+          res.data.map((t: any) => ({
+            id: t.id,
+            name: t.name,
+            emp_count: t.emp_count,
+          }))
+        )
+      }
+    } catch {
+      toast.error("Failed to fetch employment types")
+    } finally {
+      setLoading(false)
     }
-    setTypes([...types, newType])
   }
 
-  const handleUpdateType = (name: string) => {
-    if (!selectedType) return
-    const updated = types.map((t) =>
-      t.id === selectedType.id ? { ...t, name } : t
-    )
-    setTypes(updated)
+  useEffect(() => {
+    fetchEmploymentTypes()
+  }, [])
+
+  /* ---------------- CREATE ---------------- */
+
+  const handleCreateType = async (name: string) => {
+    try {
+      const res = await createEmploymentType({ name })
+
+      if (res?.data) {
+        setTypes((prev) => [
+          ...prev,
+          {
+            id: res.data.id,
+            name: res.data.name,
+            emp_count: res.data.emp_count,
+          },
+        ])
+        toast.success("Employment type created successfully")
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to create employment type")
+    }
   }
 
-  const handleDeleteType = () => {
+  /* ---------------- UPDATE ---------------- */
+
+  const handleUpdateType = async (name: string) => {
     if (!selectedType) return
-    setTypes(types.filter((t) => t.id !== selectedType.id))
-    setIsDeleteAlertOpen(false)
+
+    try {
+      const res = await updateEmploymentType(selectedType.id, { name })
+
+      if (res?.data) {
+        setTypes((prev) =>
+          prev.map((t) =>
+            t.id === selectedType.id
+              ? { ...t, name: res.data.name }
+              : t
+          )
+        )
+        toast.success("Employment type updated successfully")
+        setSelectedType(null)
+      }
+    } catch (error: any) {
+      console.error(error)
+      toast.error(error?.data?.detail || "Failed to update employment type")
+    }
+  }
+
+  /* ---------------- DELETE ---------------- */
+
+  const handleDeleteType = async () => {
+    if (!selectedType) return
+
+    try {
+      await deleteEmploymentType(selectedType.id)
+      setTypes((prev) =>
+        prev.filter((t) => t.id !== selectedType.id)
+      )
+      toast.success("Employment type deleted successfully")
+    } catch {
+      toast.error("Failed to delete employment type")
+    } finally {
+      setIsDeleteAlertOpen(false)
+      setSelectedType(null)
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* ===== Main Content ===== */}
       <div className="flex-grow w-full space-y-4 p-6">
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -100,101 +184,100 @@ export default function EmploymentTypesPage() {
             <Table className="w-full">
               <TableHeader>
                 <TableRow className="border-b border-gray-100 bg-blue-100 h-[56px]">
-                  <TableHead className="px-5 py-4 text-left font-medium text-gray-500 text-sm">
+                  <TableHead className="px-5 py-4 text-left text-sm">
                     Employment Type
                   </TableHead>
-                  <TableHead className="px-5 py-4 text-center font-medium text-gray-500 text-sm">
+                  <TableHead className="px-5 py-4 text-center text-sm">
                     Employee Count
                   </TableHead>
-                  <TableHead className="px-5 py-4 text-center font-medium text-gray-500 text-sm w-32">
+                  <TableHead className="px-5 py-4 text-center text-sm w-32">
                     Action
                   </TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
-                {types.map((type) => (
-                  <TableRow
-                    key={type.id}
-                    className="border-b border-gray-100 hover:bg-slate-50/40 h-[68px]"
-                  >
-                    <TableCell className="px-5 py-4">
-                      <span className="font-medium text-sm text-gray-800">
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i} className="h-[68px]">
+                      <TableCell className="px-5 py-4">
+                        <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
+                      </TableCell>
+                      <TableCell className="px-5 py-4 text-center">
+                        <div className="h-4 w-10 bg-gray-200 rounded mx-auto animate-pulse" />
+                      </TableCell>
+                      <TableCell className="px-5 py-4 text-center">
+                        <div className="h-8 w-8 bg-gray-200 rounded mx-auto animate-pulse" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  types.map((type) => (
+                    <TableRow
+                      key={type.id}
+                      className="border-b border-gray-100 hover:bg-slate-50/40 h-[68px]"
+                    >
+                      <TableCell className="px-5 py-4 font-medium text-sm">
                         {type.name}
-                      </span>
-                    </TableCell>
+                      </TableCell>
 
-                    <TableCell className="px-5 py-4 text-center">
-                      <span className="text-sm text-gray-600 font-medium">
-                        {type.employeeCount}
-                      </span>
-                    </TableCell>
+                      <TableCell className="px-5 py-4 text-center text-sm font-medium">
+                        {type.emp_count}
+                      </TableCell>
 
-                    <TableCell className="px-5 py-4">
-                      <div className="flex items-center justify-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-gray-100"
-                            >
-                              <MoreVertical className="h-4 w-4 text-gray-600" />
-                            </Button>
-                          </DropdownMenuTrigger>
+                      <TableCell className="px-5 py-4">
+                        <div className="flex items-center justify-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
 
-                          <DropdownMenuContent
-                            align="end"
-                            className="w-40 bg-white border border-gray-200 shadow-lg rounded-xl p-1"
-                          >
-                            <DropdownMenuItem
-                              className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
-                              onClick={() => {
-                                setSelectedType(type)
-                                setDialogMode("edit")
-                                setIsDialogOpen(true)
-                              }}
-                            >
-                              <Pencil className="h-4 w-4 mr-2" /> Edit
-                            </DropdownMenuItem>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
+                                onClick={() => {
+                                  setSelectedType(type)
+                                  setDialogMode("edit")
+                                  setIsDialogOpen(true)
+                                }}
+                              >
+                                <Pencil className="h-4 w-4 mr-2" /> Edit
+                              </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
-                              onClick={() => {
-                                setSelectedType(type)
-                                setIsDeleteAlertOpen(true)
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                              <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
+                                onClick={() => {
+                                  setSelectedType(type)
+                                  setIsDeleteAlertOpen(true)
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" /> Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
-
           </div>
         </div>
       </div>
 
-      {/* ===== Sticky Footer ===== */}
-      <div className="p-4 bg-slate-50/40 flex items-center justify-between text-sm text-muted-foreground border-t border-gray-200 mt-auto">
-        <div>Showing {types.length} of {types.length} types</div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>Previous</Button>
-          <Button variant="outline" size="sm" disabled>Next</Button>
-        </div>
-      </div>
-
-      {/* ===== Dialogs ===== */}
+      {/* FORM DIALOG */}
       <EmploymentTypeFormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
-        initialData={selectedType}
+        initialData={selectedType ?? undefined}
         onSubmit={(name) =>
           dialogMode === "create"
             ? handleCreateType(name)
@@ -202,6 +285,7 @@ export default function EmploymentTypesPage() {
         }
       />
 
+      {/* DELETE ALERT */}
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -213,7 +297,7 @@ export default function EmploymentTypesPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 text-white"
               onClick={handleDeleteType}
             >
               Delete

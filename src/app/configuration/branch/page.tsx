@@ -96,10 +96,10 @@ export default function BranchesPage() {
 
           },
         ])
-        // toast.success(res.message)
+        toast.success("Branch created successfully")
       }
-    } catch {
-      toast.error("Failed to create branch")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to create branch")
     }
   }
 
@@ -118,8 +118,8 @@ export default function BranchesPage() {
         toast.success("Branch updated successfully")
         console.log(res);
       }
-    } catch {
-      toast.error("Failed to update branch")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to update branch")
     }
   }
 
@@ -135,8 +135,8 @@ export default function BranchesPage() {
         )
         toast.success("Branch deleted successfully")
       }
-    } catch {
-      toast.error("Failed to delete branch")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to delete branch")
     } finally {
       setIsDeleteAlertOpen(false)
     }
@@ -230,6 +230,7 @@ export default function BranchesPage() {
                               className="w-40 bg-white border border-gray-200 shadow-lg rounded-xl p-1"
                             >
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
                                 onClick={() => {
                                   setSelectedBranch(branch)
                                   setDialogMode("edit")
@@ -240,6 +241,7 @@ export default function BranchesPage() {
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
                                 onClick={() => {
                                   setSelectedBranch(branch)
                                   setIsDeleteAlertOpen(true)

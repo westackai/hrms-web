@@ -82,3 +82,20 @@ export const updateShift = (id: string, payload: any) => {
 export const deleteShift = (id: string) => {
   return deleteRequest(`${ENDPOINTS.DELETE_SHIFT}/${id}`)
 }
+
+// Employment Type APIs
+export const showAllEmploymentTypes = () => {
+  return getRequest(ENDPOINTS.GET_ALL_EMPLOYMENT_TYPE);
+};
+
+export const createEmploymentType = (payload: any) => {
+  return postRequest(ENDPOINTS.CREATE_EMPLOYMENT_TYPE, payload)
+}
+
+export const updateEmploymentType = (id: string, payload: any) => {
+  return putRequest(`${ENDPOINTS.UPDATE_EMPLOYMENT_TYPE}/${id}`, payload)
+}
+
+export const deleteEmploymentType = (id: string) => {
+  return deleteRequest(`${ENDPOINTS.DELETE_EMPLOYMENT_TYPE}/${id}`)
+}

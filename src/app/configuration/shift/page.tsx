@@ -111,7 +111,7 @@ export default function ShiftsPage() {
         ])
         toast.success("Shift created successfully")
       }
-    } catch (error : any) {
+    } catch (error: any) {
       console.error(error)
       toast.error(error?.data?.detail || "Failed to create shift")
     }
@@ -138,19 +138,19 @@ export default function ShiftsPage() {
           prev.map((s) =>
             s.id === selectedShift.id
               ? {
-                  ...s,
-                  name: res.data.shift_name,
-                  startTime: res.data.start_time,
-                  endTime: res.data.endtime,
-                }
+                ...s,
+                name: res.data.shift_name,
+                startTime: res.data.start_time,
+                endTime: res.data.endtime,
+              }
               : s
           )
         )
         toast.success("Shift updated successfully")
         setSelectedShift(null)
       }
-    } catch {
-      toast.error("Failed to update shift")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to update shift")
     }
   }
 
@@ -165,8 +165,8 @@ export default function ShiftsPage() {
         prev.filter((s) => s.id !== selectedShift.id)
       )
       toast.success("Shift deleted successfully")
-    } catch {
-      toast.error("Failed to delete shift")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to delete shift")
     } finally {
       setIsDeleteAlertOpen(false)
       setSelectedShift(null)
@@ -267,6 +267,7 @@ export default function ShiftsPage() {
 
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
                                 onClick={() => {
                                   setSelectedShift(shift)
                                   setDialogMode("edit")
@@ -277,6 +278,7 @@ export default function ShiftsPage() {
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
                                 onClick={() => {
                                   setSelectedShift(shift)
                                   setIsDeleteAlertOpen(true)

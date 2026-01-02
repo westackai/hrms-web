@@ -112,10 +112,10 @@ export default function DepartmentsPage() {
             emp_count: res.data.emp_count,
           },
         ])
-        // toast.success(res.message)
+        toast.success("Department created successfully")
       }
-    } catch {
-      toast.error("Failed to create department")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to create department")
     }
   }
 
@@ -140,8 +140,8 @@ export default function DepartmentsPage() {
         toast.success("Department updated successfully")
         setSelectedDept(null)
       }
-    } catch {
-      toast.error("Failed to update department")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to update department")
     }
   }
 
@@ -156,8 +156,8 @@ export default function DepartmentsPage() {
         prev.filter(d => d.id !== selectedDept.id)
       )
       toast.success("Department deleted successfully")
-    } catch {
-      toast.error("Failed to delete department")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to delete department")
     } finally {
       setIsDeleteAlertOpen(false)
       setSelectedDept(null)
@@ -251,6 +251,7 @@ export default function DepartmentsPage() {
 
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
                                 onClick={() => {
                                   setSelectedDept(dept)
                                   setDialogMode("edit")
@@ -261,6 +262,7 @@ export default function DepartmentsPage() {
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
                                 onClick={() => {
                                   setSelectedDept(dept)
                                   setIsDeleteAlertOpen(true)

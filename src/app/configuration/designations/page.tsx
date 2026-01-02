@@ -102,8 +102,8 @@ export default function DesignationsPage() {
         ])
         toast.success("Designation created successfully")
       }
-    } catch {
-      toast.error("Failed to create designation")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to create designation")
     }
   }
 
@@ -126,8 +126,8 @@ export default function DesignationsPage() {
         toast.success("Designation updated successfully")
         setSelectedDesignation(null)
       }
-    } catch {
-      toast.error("Failed to update designation")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to update designation")
     }
   }
 
@@ -142,8 +142,8 @@ export default function DesignationsPage() {
         prev.filter((d) => d.id !== selectedDesignation.id)
       )
       toast.success("Designation deleted successfully")
-    } catch {
-      toast.error("Failed to delete designation")
+    } catch (error: any) {
+      toast.error(error?.data?.detail || "Failed to delete designation")
     } finally {
       setIsDeleteAlertOpen(false)
       setSelectedDesignation(null)
@@ -237,6 +237,7 @@ export default function DesignationsPage() {
 
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-blue-50 hover:text-blue-600"
                                 onClick={() => {
                                   setSelectedDesignation(item)
                                   setDialogMode("edit")
@@ -247,6 +248,7 @@ export default function DesignationsPage() {
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
+                                className="cursor-pointer rounded-md px-3 py-2 hover:bg-red-50 hover:text-red-600"
                                 onClick={() => {
                                   setSelectedDesignation(item)
                                   setIsDeleteAlertOpen(true)
