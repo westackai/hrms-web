@@ -55,62 +55,50 @@ export default function AddEmployeePage() {
 
   /* ---------------- SAVE ONLY (API CALL) ---------------- */
 
-  const handleSaveOnly = async () => {
-    try {
-      await Step1Schema.validate(formik.values, { abortEarly: false })
-      formik.setErrors({})
-      setIsSubmitting(true)
+  /* ---------------- CREATE EMPLOYEE (REUSABLE) ---------------- */
 
-      const payload = {
-        first_name: formik.values.firstName,
-        middle_name: formik.values.middleName || "",
-        last_name: formik.values.lastName,
-        office_email: formik.values.officialEmail || "",
-        personal_email: formik.values.personalEmail,
-        mobile_number: formik.values.mobileNumber,
-        date_of_birth: formik.values.dob,
-        gender: formik.values.gender,
-        marital_status: formik.values.maritalStatus || "",
-        blood_group: formik.values.bloodGroup || "",
-        password: "Welcome@123",
-      }
+  const createEmployeeAndGetId = async () => {
+    await Step1Schema.validate(formik.values, { abortEarly: false })
+    formik.setErrors({})
 
-      const res = await createEmployee(payload)
-
-      if (res) {
-        toast.success("Employee created successfully!", { position: "top-center" })
-      } else {
-        toast.error(res || "Failed to create employee")
-      }
-
-      setIsSubmitting(false)
-    } catch (err: any) {
-      setIsSubmitting(false)
-      const errors: Record<string, string> = {}
-
-      if (err.inner?.length) {
-        err.inner.forEach((e: any) => {
-          if (e.path && !errors[e.path]) errors[e.path] = e.message
-        })
-      }
-
-      formik.setErrors(errors)
-      const firstError = Object.values(errors)[0]
-      if (firstError) toast.error(firstError, { position: "top-center" })
+    const payload = {
+      first_name: formik.values.firstName,
+      middle_name: formik.values.middleName || "",
+      last_name: formik.values.lastName,
+      office_email: formik.values.officialEmail || "",
+      personal_email: formik.values.personalEmail,
+      mobile_number: formik.values.mobileNumber,
+      date_of_birth: formik.values.dob,
+      gender: formik.values.gender,
+      marital_status: formik.values.maritalStatus || "",
+      blood_group: formik.values.bloodGroup || "",
+      password: "Welcome@123",
     }
+
+    const res = await createEmployee(payload)
+
+    if (!res?.data?.id) {
+      throw new Error(res?.data?.detail || "Failed to create employee")
+    }
+
+    return res.data.id
   }
+
 
   /* ---------------- NEXT BUTTON (UNCHANGED) ---------------- */
 
-  const handleSaveUpdate = async () => {
+  const handleSaveOnly = async () => {
     try {
-      await Step1Schema.validate(formik.values, { abortEarly: false })
-      formik.setErrors({})
-      setSubmitAndUpdating(true)
-      await formik.submitForm()
-      setSubmitAndUpdating(false)
+      setIsSubmitting(true)
+      const employeeId = await createEmployeeAndGetId()
+
+      toast.success("Employee created successfully!", {
+        position: "top-center",
+      })
+
+      // optional: store id if needed later
+      localStorage.setItem("employeeId", employeeId)
     } catch (err: any) {
-      setSubmitAndUpdating(false)
       const errors: Record<string, string> = {}
 
       if (err.inner?.length) {
@@ -120,10 +108,45 @@ export default function AddEmployeePage() {
       }
 
       formik.setErrors(errors)
-      const firstError = Object.values(errors)[0]
-      if (firstError) toast.error(firstError, { position: "top-center" })
+      toast.error(err.message || "Failed to create employee", {
+        position: "top-center",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
+  const handleSaveUpdate = async () => {
+    try {
+      setSubmitAndUpdating(true)
+
+      const employeeId = await createEmployeeAndGetId()
+
+      toast.success("Employee created successfully!", {
+        position: "top-center",
+      })
+
+      router.push(
+        `/administration/employees/edit-employee/${employeeId}`
+      )
+    } catch (err: any) {
+      const errors: Record<string, string> = {}
+
+      if (err.inner?.length) {
+        err.inner.forEach((e: any) => {
+          if (e.path && !errors[e.path]) errors[e.path] = e.message
+        })
+      }
+
+      formik.setErrors(errors)
+      toast.error(err.message || "Failed to create employee", {
+        position: "top-center",
+      })
+    } finally {
+      setSubmitAndUpdating(false)
+    }
+  }
+
 
   const titles = [
     "Basic Details",
@@ -145,7 +168,7 @@ export default function AddEmployeePage() {
           </CardTitle>
         </CardHeader>
 
-  <CardContent className="pt-3">
+        <CardContent className="pt-3">
           <Tabs value="0">
             <TabsList className="grid grid-cols-5 gap-2 mb-12 bg-gray-50 p-3 rounded-lg">
               {titles.map((t, idx) => (
@@ -153,19 +176,17 @@ export default function AddEmployeePage() {
                   key={t}
                   value={String(idx)}
                   disabled={idx !== 0}
-                  className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    idx === 0
-                      ? "bg-white shadow-md ring-2 ring-blue-500"
-                      : "bg-transparent opacity-40 cursor-not-allowed"
-                  }`}
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${idx === 0
+                    ? "bg-white shadow-md ring-2 ring-blue-500"
+                    : "bg-transparent opacity-40 cursor-not-allowed"
+                    }`}
                 >
                   <div className="flex items-center gap-3 w-full">
                     <div
-                      className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all ${
-                        idx === 0
-                          ? "border-blue-600 bg-blue-600"
-                          : "border-gray-300 bg-gray-400"
-                      }`}
+                      className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all ${idx === 0
+                        ? "border-blue-600 bg-blue-600"
+                        : "border-gray-300 bg-gray-400"
+                        }`}
                     >
                       {idx === 0 && <User className="w-5 h-5 text-white" />}
                       {idx === 1 && <Briefcase className="w-5 h-5 text-white" />}
@@ -175,9 +196,8 @@ export default function AddEmployeePage() {
                     </div>
                     <div className="flex flex-col text-left flex-1">
                       <span
-                        className={`text-sm font-medium ${
-                          idx === 0 ? "text-blue-600" : "text-gray-800"
-                        }`}
+                        className={`text-sm font-medium ${idx === 0 ? "text-blue-600" : "text-gray-800"
+                          }`}
                       >
                         {t}
                       </span>
@@ -196,7 +216,7 @@ export default function AddEmployeePage() {
           </div>
 
           <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
-             <Button
+            <Button
               className="h-10 bg-red-500 hover:bg-red-600 text-white"
               onClick={() => router.back()}
             >
@@ -207,17 +227,17 @@ export default function AddEmployeePage() {
               <Button
                 onClick={handleSaveOnly}
                 disabled={isSubmitting}
-                
+
                 className="h-10 px-6 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-300"
               >
-              
+
                 {isSubmitting ? "Saving..." : "Save"}
               </Button>
 
               <Button
                 onClick={handleSaveUpdate}
                 disabled={SubmitAndUpdating}
-                 className="h-10 px-6 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-300"
+                className="h-10 px-6 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-300"
               >
                 {SubmitAndUpdating ? "Saving..." : "Next"}
               </Button>

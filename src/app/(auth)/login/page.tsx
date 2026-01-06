@@ -12,41 +12,57 @@ import { Eye, EyeOff, CircleAlert } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { loginUser } from "@/network/Api"; // ✅ added
 
 export default function LoginPage() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    
-    const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // ---------------- FORM VALIDATION ----------------
-    const formik = useFormik({
-        initialValues: {
-            email: "",
-            password: "",
-            remember: false,
-        },
+  const router = useRouter();
 
-        validationSchema: Yup.object({
-            email: Yup.string()
-                .email("Enter a valid email") // invalid email format
-                .required("Email is required"), // empty field
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      remember: false,
+    },
 
-            password: Yup.string()
-                .required("Password is required") // empty password
-                .min(6, "Password must be at least 6 characters"), // optional rule
-        }),
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email("Enter a valid email")
+        .required("Email is required"),
 
-        onSubmit: async (values) => {
-            setIsSubmitting(true)
-            toast.success("Logged in successfully!");
+      password: Yup.string()
+        .required("Password is required")
+        .min(6, "Password must be at least 6 characters"),
+    }),
 
-            await new Promise((r) => setTimeout(r, 300));
+    onSubmit: async (values) => {
+      try {
+        setIsSubmitting(true);
 
-            router.push("/dashboard");
-        },
-    });
+        const res = await loginUser({
+          email: values.email,
+          password: values.password,
+        });
 
+        if (res) {
+          localStorage.setItem("access_token", res.data.access_token);
+
+          toast.success("Login successful");
+          router.push("/dashboard");
+        } else {
+          toast.error( "Login failed");
+        }
+      } catch (error: any) {
+        toast.error(
+          error?.response?.data?.message || "Invalid email or password"
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+  });
     return (
         <div className="min-h-screen flex items-center justify-center bg-white px-4">
             <Card className="w-full max-w-md shadow-none border-none">
@@ -70,8 +86,8 @@ export default function LoginPage() {
                                 name="email"
                                 placeholder="Enter your email"
                                 className={`h-12 transition-all ${formik.touched.email && formik.errors.email
-                                        ? "border-red-500"
-                                        : "border-gray-300"
+                                    ? "border-red-500"
+                                    : "border-gray-300"
                                     } focus:border-blue-500 focus:ring-2 focus:ring-blue-200`}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -96,8 +112,8 @@ export default function LoginPage() {
                                     name="password"
                                     placeholder="Enter your password"
                                     className={`h-12 pr-12 transition-all ${formik.touched.password && formik.errors.password
-                                            ? "border-red-500"
-                                            : "border-gray-300"
+                                        ? "border-red-500"
+                                        : "border-gray-300"
                                         } focus:border-blue-500 focus:ring-2 focus:ring-blue-200`}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}

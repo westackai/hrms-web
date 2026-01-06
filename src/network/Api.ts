@@ -1,6 +1,12 @@
 import { postRequest, getRequest, deleteRequest, putRequest } from "./ApiRequest"
 import { ENDPOINTS } from "./Endpoints"
 
+export const loginUser = (payload: {
+  email: string, password: string
+}) => {
+  return postRequest(ENDPOINTS.USER_LOGIN, payload)
+}
+
 // Employee APIs
 export const showAllEmployees = () => {
   return getRequest(ENDPOINTS.GET_ALL_EMPLOYEES);
