@@ -36,6 +36,7 @@ import toast from "react-hot-toast"
 
 import { showAllEmployees } from "@/network/Api"
 import Loader from "@/components/ui/loader"
+import { toTitleCase } from "@/utils/stringUtils"
 
 /* ================= TYPES ================= */
 
@@ -79,7 +80,7 @@ export default function EmployeesTable() {
           month: "short",
           year: "numeric",
         }),
-        branch: emp.worklocation || "WESTACK SOLUTIONS LLP",
+        branch: emp.worklocation || "N/A",
         status: emp.is_active ? "Active" : "Inactive",
       }))
 
@@ -203,7 +204,7 @@ export default function EmployeesTable() {
                     <div className="flex items-center gap-3 pl-2">
                       <Avatar className="h-9 w-9 ring-2 ring-gray-100">
                         <AvatarFallback>
-                          {row.name
+                          {toTitleCase(row.name)
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
@@ -211,21 +212,21 @@ export default function EmployeesTable() {
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="font-medium text-sm text-gray-800">
-                          {row.name}
+                          {toTitleCase(row.name)}
                         </span>
                         <span className="text-gray-500 text-xs">
-                          {row.designation}
+                          {toTitleCase(row.designation)}
                         </span>
                       </div>
                     </div>
                   </TableCell>
 
                   <TableCell className="text-gray-500 text-sm">
-                    {row.department}
+                    {toTitleCase(row.department)}
                   </TableCell>
 
                   <TableCell className="text-gray-500 text-sm">
-                    {row.designation}
+                    {toTitleCase(row.designation)}
                   </TableCell>
 
                   <TableCell className="text-gray-500 text-sm">
@@ -233,7 +234,7 @@ export default function EmployeesTable() {
                   </TableCell>
 
                   <TableCell className="text-gray-500 text-sm text-center">
-                    {row.branch}
+                    {toTitleCase(row.branch)}
                   </TableCell>
 
                   <TableCell className="text-center">
