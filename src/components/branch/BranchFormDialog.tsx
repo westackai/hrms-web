@@ -17,9 +17,10 @@ type BranchFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (name: string) => void
-  initialData?: { id?: number; name: string }
+  initialData?: { id?: string; name: string }
   mode: "create" | "edit"
 }
+
 
 export default function BranchFormDialog({
   open,

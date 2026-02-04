@@ -13,7 +13,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-type EmploymentTypeFormDialogProps = {
+/* ================= TYPES ================= */
+
+type DepartmentFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (name: string) => void
@@ -21,26 +23,28 @@ type EmploymentTypeFormDialogProps = {
   mode: "create" | "edit"
 }
 
-export default function EmploymentTypeFormDialog({
+/* ================= COMPONENT ================= */
+
+export default function DepartmentFormDialog({
   open,
   onOpenChange,
   onSubmit,
   initialData,
   mode,
-}: EmploymentTypeFormDialogProps) {
-  const [typeName, setTypeName] = useState("")
+}: DepartmentFormDialogProps) {
+  const [departmentName, setDepartmentName] = useState("")
 
   useEffect(() => {
     if (initialData?.name) {
-      setTypeName(initialData.name)
+      setDepartmentName(initialData.name)
     } else {
-      setTypeName("")
+      setDepartmentName("")
     }
   }, [initialData, open])
 
   const handleSubmit = () => {
-    if (!typeName.trim()) return
-    onSubmit(typeName.trim())
+    if (!departmentName.trim()) return
+    onSubmit(departmentName.trim())
     onOpenChange(false)
   }
 
@@ -49,40 +53,46 @@ export default function EmploymentTypeFormDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            {mode === "create" ? "Add Employment Type" : "Edit Employment Type"}
+            {mode === "create" ? "Create New Department" : "Edit Department"}
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {mode === "create"
-              ? "Add a new employment type such as Full-Time, Part-Time, or Intern."
-              : "Edit the selected employment type below."}
+              ? "Add a new department to your organization. Fill in the details below."
+              : "Update the department name and save your changes."}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="type-name" className="text-sm font-medium">
-              Employment Type <span className="text-red-500">*</span>
+            <Label htmlFor="department-name" className="text-sm font-medium">
+              Department Name <span className="text-red-500">*</span>
             </Label>
             <Input
-              id="type-name"
-              placeholder="e.g., Full-Time"
-              value={typeName}
-              onChange={(e) => setTypeName(e.target.value)}
+              id="department-name"
+              placeholder="e.g., Software Development"
+              value={departmentName}
+              onChange={(e) => setDepartmentName(e.target.value)}
               className="w-full focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              onOpenChange(false)
+              setDepartmentName("")
+            }}
+          >
             Cancel
           </Button>
           <Button
             className="bg-blue-600 hover:bg-blue-700 text-white"
             onClick={handleSubmit}
-            disabled={!typeName.trim()}
+            disabled={!departmentName.trim()}
           >
-            {mode === "create" ? "Add Type" : "Update Type"}
+            {mode === "create" ? "Add Department" : "Update Department"}
           </Button>
         </DialogFooter>
       </DialogContent>

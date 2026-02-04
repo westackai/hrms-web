@@ -10,9 +10,11 @@ import BasicDetails from "@/components/employee/BasicDetails"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, User, Briefcase, CreditCard, School, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { createEmployee } from "@/network/Api"
+
+/* ---------------- VALIDATION ---------------- */
 
 const Step1Schema = Yup.object({
-  employeeCode: Yup.string().required("Employee Code is required"),
   firstName: Yup.string().required("First Name is required"),
   lastName: Yup.string().required("Last Name is required"),
   gender: Yup.string().required("Gender is required"),
@@ -20,7 +22,10 @@ const Step1Schema = Yup.object({
   mobileNumber: Yup.string()
     .matches(/^[0-9]{10}$/, "Enter valid 10 digit number")
     .required("Mobile Number is required"),
+  personalEmail: Yup.string().email().required("Personal Email is required"),
 })
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function AddEmployeePage() {
   const router = useRouter()
@@ -29,69 +34,119 @@ export default function AddEmployeePage() {
 
   const formik = useFormik({
     initialValues: {
-      employeeCode: "EMP001",
-      firstName: "John",
-      middleName: "A.",
-      lastName: "Doe",
-      gender: "Male",
-      dob: "1995-01-01",
-      maritalStatus: "Single",
-      bloodGroup: "O+",
-      mobileNumber: "9876543210",
-      officialEmail: "john.doe@company.com",
-      personalEmail: "john.doe@example.com",
+      employeeCode: "",
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      gender: "",
+      dob: "",
+      maritalStatus: "",
+      bloodGroup: "",
+      mobileNumber: "",
+      officialEmail: "",
+      personalEmail: "",
     },
     onSubmit: async (values) => {
-      await new Promise((r) => setTimeout(r, 700))
       localStorage.setItem("employeeBasic", JSON.stringify(values))
-      toast.success("Employee added!", { position: "top-center" })
+      toast.success("Employee saved!", { position: "top-center" })
       router.push("/administration/employees/edit-employee")
     },
   })
 
-  const handleSaveUpdate = async () => {
-    try {
-      await Step1Schema.validate(formik.values, { abortEarly: false })
-      formik.setErrors({})
-      setSubmitAndUpdating(true)
-      await formik.submitForm()
-      setSubmitAndUpdating(false)
-    } catch (err: any) {
-      setSubmitAndUpdating(false)
-      const errors: Record<string, string> = {}
-      if (err.inner && err.inner.length) {
-        err.inner.forEach((e: any) => {
-          if (e.path && !errors[e.path]) errors[e.path] = e.message
-        })
-      }
-      formik.setErrors(errors)
-      const first = Object.values(errors)[0]
-      if (first) toast.error(first, { position: "top-center" })
+  /* ---------------- SAVE ONLY (API CALL) ---------------- */
+
+  /* ---------------- CREATE EMPLOYEE (REUSABLE) ---------------- */
+
+  const createEmployeeAndGetId = async () => {
+    await Step1Schema.validate(formik.values, { abortEarly: false })
+    formik.setErrors({})
+
+    const payload = {
+      first_name: formik.values.firstName,
+      middle_name: formik.values.middleName || "",
+      last_name: formik.values.lastName,
+      office_email: formik.values.officialEmail || "",
+      personal_email: formik.values.personalEmail,
+      mobile_number: formik.values.mobileNumber,
+      date_of_birth: formik.values.dob,
+      gender: formik.values.gender,
+      marital_status: formik.values.maritalStatus || "",
+      blood_group: formik.values.bloodGroup || "",
+      password: "Welcome@123",
     }
+
+    const res = await createEmployee(payload)
+
+    if (!res?.data?.id) {
+      throw new Error(res?.data?.detail || "Failed to create employee")
+    }
+
+    return res.data.id
   }
+
+
+  /* ---------------- NEXT BUTTON (UNCHANGED) ---------------- */
 
   const handleSaveOnly = async () => {
     try {
-      await Step1Schema.validate(formik.values, { abortEarly: false })
-      formik.setErrors({})
       setIsSubmitting(true)
-      await new Promise((r) => setTimeout(r, 700))
-      localStorage.setItem("employeeBasic", JSON.stringify(formik.values))
-      toast.success("Employee added!", { position: "top-center" })
-      setIsSubmitting(false)
+      const employeeId = await createEmployeeAndGetId()
+
+      toast.success("Employee created successfully!", {
+        position: "top-center",
+      })
+
+      // optional: store id if needed later
+      localStorage.setItem("employeeId", employeeId)
     } catch (err: any) {
-      setIsSubmitting(false)
       const errors: Record<string, string> = {}
-      if (err.inner && err.inner.length) {
+
+      if (err.inner?.length) {
         err.inner.forEach((e: any) => {
           if (e.path && !errors[e.path]) errors[e.path] = e.message
         })
       }
+
       formik.setErrors(errors)
-      const first = Object.values(errors)[0]
-      if (first) toast.error(first, { position: "top-center" })
+      toast.error(err.message || "Failed to create employee", {
+        position: "top-center",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
+  const handleSaveUpdate = async () => {
+    try {
+      setSubmitAndUpdating(true)
+
+      const employeeId = await createEmployeeAndGetId()
+
+      toast.success("Employee created successfully!", {
+        position: "top-center",
+      })
+
+      router.push(
+        `/administration/employees/edit-employee/${employeeId}`
+      )
+    } catch (err: any) {
+      const errors: Record<string, string> = {}
+
+      if (err.inner?.length) {
+        err.inner.forEach((e: any) => {
+          if (e.path && !errors[e.path]) errors[e.path] = e.message
+        })
+      }
+
+      formik.setErrors(errors)
+      toast.error(err.message || "Failed to create employee", {
+        position: "top-center",
+      })
+    } finally {
+      setSubmitAndUpdating(false)
+    }
+  }
+
 
   const titles = [
     "Basic Details",
@@ -104,14 +159,8 @@ export default function AddEmployeePage() {
   return (
     <div className="p-6">
       <Card className="shadow-md border border-gray-200 rounded-xl">
-        {/* Header */}
         <CardHeader className="border-b pb-4 border-gray-300 flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-            className="text-blue-600 hover:text-blue-800"
-          >
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-blue-600">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <CardTitle className="text-blue-600 text-xl font-semibold">
@@ -119,7 +168,6 @@ export default function AddEmployeePage() {
           </CardTitle>
         </CardHeader>
 
-        {/* Tabs */}
         <CardContent className="pt-3">
           <Tabs value="0">
             <TabsList className="grid grid-cols-5 gap-2 mb-12 bg-gray-50 p-3 rounded-lg">
@@ -128,19 +176,17 @@ export default function AddEmployeePage() {
                   key={t}
                   value={String(idx)}
                   disabled={idx !== 0}
-                  className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    idx === 0
-                      ? "bg-white shadow-md ring-2 ring-blue-500"
-                      : "bg-transparent opacity-40 cursor-not-allowed"
-                  }`}
+                  className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${idx === 0
+                    ? "bg-white shadow-md ring-2 ring-blue-500"
+                    : "bg-transparent opacity-40 cursor-not-allowed"
+                    }`}
                 >
                   <div className="flex items-center gap-3 w-full">
                     <div
-                      className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all ${
-                        idx === 0
-                          ? "border-blue-600 bg-blue-600"
-                          : "border-gray-300 bg-gray-400"
-                      }`}
+                      className={`w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all ${idx === 0
+                        ? "border-blue-600 bg-blue-600"
+                        : "border-gray-300 bg-gray-400"
+                        }`}
                     >
                       {idx === 0 && <User className="w-5 h-5 text-white" />}
                       {idx === 1 && <Briefcase className="w-5 h-5 text-white" />}
@@ -150,9 +196,8 @@ export default function AddEmployeePage() {
                     </div>
                     <div className="flex flex-col text-left flex-1">
                       <span
-                        className={`text-sm font-medium ${
-                          idx === 0 ? "text-blue-600" : "text-gray-800"
-                        }`}
+                        className={`text-sm font-medium ${idx === 0 ? "text-blue-600" : "text-gray-800"
+                          }`}
                       >
                         {t}
                       </span>
@@ -166,12 +211,10 @@ export default function AddEmployeePage() {
             </TabsList>
           </Tabs>
 
-          {/* Only Basic Details Form */}
           <div className="bg-white p-8 mt-4 rounded-md border border-gray-100 shadow-sm">
             <BasicDetails formik={formik} />
           </div>
 
-          {/* Footer Buttons */}
           <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
             <Button
               className="h-10 bg-red-500 hover:bg-red-600 text-white"
@@ -179,12 +222,15 @@ export default function AddEmployeePage() {
             >
               Cancel
             </Button>
+
             <div className="flex gap-3">
               <Button
                 onClick={handleSaveOnly}
                 disabled={isSubmitting}
+
                 className="h-10 px-6 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-300"
               >
+
                 {isSubmitting ? "Saving..." : "Save"}
               </Button>
 
@@ -200,7 +246,5 @@ export default function AddEmployeePage() {
         </CardContent>
       </Card>
     </div>
-
-    
   )
 }

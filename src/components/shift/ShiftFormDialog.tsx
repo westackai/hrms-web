@@ -17,7 +17,7 @@ type ShiftFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (shift: { name: string; startTime: string; endTime: string }) => void
-  initialData?: { id?: number; name: string; startTime: string; endTime: string }
+  initialData?: { id?: string; name: string; startTime: string; endTime: string }
   mode: "create" | "edit"
 }
 
